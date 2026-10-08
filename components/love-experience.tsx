@@ -6,6 +6,7 @@ import { ArrowDown, ArrowUpRight, Pause, Play, Volume2 } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
+import LilyGarden from "@/components/lily-garden";
 import {
   ifWeWere,
   memories,
@@ -27,6 +28,70 @@ export default function LoveExperience() {
   const [audioFailed, setAudioFailed] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [secretOpened, setSecretOpened] = useState(false);
+  const [caught, setCaught] = useState<number[]>([]);
+  const [petalsReleased, setPetalsReleased] = useState(false);
+
+  const spawnLoveBurst = useCallback((x = window.innerWidth / 2, y = window.innerHeight / 2) => {
+    const container = document.querySelector(".burst-layer");
+    if (!container) return;
+    const symbols = ["♡", "✦", "·", "❀"];
+    for (let i = 0; i < 8; i += 1) {
+      const node = document.createElement("span");
+      node.className = "burst-particle";
+      node.textContent = symbols[i % symbols.length];
+      node.style.left = `${x}px`;
+      node.style.top = `${y}px`;
+      container.appendChild(node);
+      gsap.fromTo(node, { x: 0, y: 0, opacity: 0.9, scale: 0.4 }, {
+        x: gsap.utils.random(-100, 100),
+        y: gsap.utils.random(-110, 30),
+        opacity: 0,
+        scale: gsap.utils.random(0.8, 1.4),
+        rotation: gsap.utils.random(-30, 30),
+        duration: gsap.utils.random(0.75, 1.2),
+        ease: "power2.out",
+        onComplete: () => node.remove(),
+      });
+    }
+  }, []);
+
+  const catchHeart = (index: number, event?: React.MouseEvent<HTMLButtonElement>) => {
+    if (caught.includes(index)) return;
+    setCaught((prev) => [...prev, index]);
+    spawnLoveBurst(event?.clientX, event?.clientY);
+    if (caught.length + 1 === 5) {
+      gsap.to(".heart-game-copy", { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" });
+    }
+  };
+
+  const releasePetals = (event?: React.MouseEvent<HTMLButtonElement>) => {
+    if (petalsReleased) return;
+    setPetalsReleased(true);
+    const layer = document.querySelector(".petal-game-layer");
+    if (!layer) return;
+    const bounds = event?.currentTarget.getBoundingClientRect();
+    const startX = bounds ? bounds.left + bounds.width / 2 : window.innerWidth / 2;
+    const startY = bounds ? bounds.top + bounds.height / 2 : window.innerHeight / 2;
+    for (let i = 0; i < 16; i += 1) {
+      const petal = document.createElement("span");
+      petal.className = "game-petal";
+      petal.textContent = "❀";
+      petal.style.left = `${startX}px`;
+      petal.style.top = `${startY}px`;
+      layer.appendChild(petal);
+      gsap.to(petal, {
+        x: gsap.utils.random(-230, 230),
+        y: gsap.utils.random(-170, 240),
+        rotation: gsap.utils.random(-180, 180),
+        opacity: 0,
+        scale: gsap.utils.random(0.6, 1.25),
+        duration: gsap.utils.random(1.1, 2),
+        ease: "power1.out",
+        onComplete: () => petal.remove(),
+      });
+    }
+  };
+
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -397,6 +462,8 @@ export default function LoveExperience() {
     setEntered(false);
     setSelectedAnswer(null);
     setSecretOpened(false);
+    setCaught([]);
+    setPetalsReleased(false);
     audioRef.current?.pause();
     if (audioRef.current) audioRef.current.currentTime = 0;
     setPlaying(false);
@@ -477,7 +544,7 @@ export default function LoveExperience() {
   };
 
   return (
-    <main ref={rootRef} className="experience">
+    <main ref={rootRef} className="experience">\n      <div className="burst-layer" aria-hidden="true" />\n      <div className="petal-game-layer" aria-hidden="true" />
       <div className="grain" aria-hidden="true" />
       <div className="intro-screen" ref={introRef} role="dialog" aria-modal="true" aria-label="A little something for Ghiscca">
         <div className="intro-orb" aria-hidden="true" />
@@ -541,7 +608,45 @@ export default function LoveExperience() {
           <span>SCROLL TO ENTER</span>
           <ArrowDown size={16} strokeWidth={1.4} />
         </a>
-        <span className="hero-coordinate">A SMALL PLACE IN THE UNIVERSE, MADE FOR YOU</span>
+        <span className="hero-coordinate">A SMALL PLACE IN THE UNIVERSE, MADE FOR YOU</span>\n        <div className="hero-lily hero-botanical" aria-hidden="true"><span className="stem" /><span className="flower">✿</span><span className="leaf l1" /><span className="leaf l2" /></div>
+      </section>
+
+      <section className="interactive-section section-pad" id="interactive">
+        <div className="interactive-title">
+          <p className="eyebrow">01 / PLAY WITH IT</p>
+          <h2>LET&apos;S GROW<br /><em>SOMETHING.</em></h2>
+          <p>Start with the flowers. The rest of the garden follows.</p>
+        </div>
+        <LilyGarden onBloom={() => spawnLoveBurst(window.innerWidth / 2, Math.min(window.innerHeight * 0.55, 560))} />
+        <div className="heart-game">
+          <div className="heart-game-copy">
+            <p className="eyebrow">A TINY GAME</p>
+            <h3>Catch five little hearts.</h3>
+            <p>{caught.length === 5 ? "You found them all. ♡" : `${5 - caught.length} more are hiding around here.`}</p>
+          </div>
+          <div className="heart-field" aria-label="Catch the floating hearts">
+            {Array.from({ length: 5 }, (_, index) => (
+              <button
+                type="button"
+                key={index}
+                className={caught.includes(index) ? "game-heart is-caught" : "game-heart"}
+                style={{ left: `${10 + index * 18}%`, top: `${24 + (index % 2) * 38}%` }}
+                onClick={(event) => catchHeart(index, event)}
+                aria-label={`Catch heart ${index + 1}`}
+              >♡</button>
+            ))}
+          </div>
+        </div>
+        <div className="petal-game">
+          <div>
+            <p className="eyebrow">ONE MORE LITTLE THING</p>
+            <h3>Let the petals fly.</h3>
+            <p>Touch the flower and watch the garden celebrate.</p>
+          </div>
+          <button type="button" className={petalsReleased ? "petal-launch is-done" : "petal-launch"} onClick={releasePetals}>
+            <span>✿</span><span>{petalsReleased ? "THEY&apos;RE FLYING" : "TOUCH THE FLOWER"}</span>
+          </button>
+        </div>
       </section>
 
       <section className="story section-pad" id="story">
