@@ -1,47 +1,54 @@
 import type { StaticImageData } from "next/image";
 import ghisccaPortrait from "@/image/Ghiscca.jpeg";
 import blondePortrait from "@/image/blonde.jpeg";
-import couplePhoto from "@/image/Nazua.jpeg";
-import smilePortrait from "@/image/slipkol.jpeg";
+import couplePhoto from "@/image/berdua.jpeg";
+import smilePortrait from "@/image/simanis.jpeg";
 import blackAndWhitePhoto from "@/image/B&W.jpeg";
 import closePortrait from "@/image/mybini.jpeg";
+import candidPortrait from "@/image/cantik.jpeg";
+import favoritePortrait from "@/image/Lura.jpeg";
+import sittingPortrait from "@/image/mbg.jpeg";
+import smilingPortrait from "@/image/Nazua.jpeg";
+
+export const recipientName = "Alura";
+export const creatorName = "Rifky";
 
 export const memories = [
   {
     chapter: "01",
-    title: "The beginning",
-    date: "A little moment, a big beginning",
+    title: "A little moment",
+    date: "A little piece of us",
     description:
-      "Some stories begin quietly. Ours became one of my favorite things without me even noticing.",
+      "I keep this one close. Some pictures say enough without needing a long story.",
     image: ghisccaPortrait,
-    imageAlt: "A favorite portrait of Ghiscca",
+    imageAlt: "A favorite portrait of Alura",
   },
   {
     chapter: "02",
-    title: "The first conversation",
-    date: "One conversation at a time",
+    title: "One of my favorites",
+    date: "A little piece of us",
     description:
-      "I could never have guessed that a simple hello would become a voice I always want to hear.",
+      "I like having this little piece of our world to come back to.",
     image: blondePortrait,
-    imageAlt: "A smiling portrait of Ghiscca",
+    imageAlt: "A playful photo strip of Alura",
   },
   {
     chapter: "03",
-    title: "The moments that stayed",
-    date: "The ordinary, made ours",
+    title: "Right here",
+    date: "One frame, both of us",
     description:
-      "The best memories aren't always the grand ones. Sometimes they're just the little things, with you.",
+      "A photo I keep close because you're right there beside me.",
     image: couplePhoto,
-    imageAlt: "A close-up photo of Ghiscca and Rifky together",
+    imageAlt: "A close-up photo of Alura and Rifky together",
   },
   {
     chapter: "04",
-    title: "And somehow...",
-    date: "My favorite person",
+    title: "Just you",
+    date: "Always worth another look",
     description:
-      "Somewhere along the way, you became the person I want to tell everything to.",
+      "I could look at this one a hundred times and still stop to look again.",
     image: closePortrait,
-    imageAlt: "A candid portrait of Ghiscca",
+    imageAlt: "A candid portrait of Alura",
   },
 ];
 
@@ -52,6 +59,17 @@ export const memoriesGallery: { image: StaticImageData; caption: string; size: "
   { image: blackAndWhitePhoto, caption: "A little photo-booth memory", size: "landscape" },
 ];
 
+export const memoriesOrbit = [
+  { image: couplePhoto, caption: "right here, next to you", alt: "A close selfie of Alura and Rifky together" },
+  { image: ghisccaPortrait, caption: "that smile of yours", alt: "A close portrait of Alura smiling" },
+  { image: sittingPortrait, caption: "a quiet little moment", alt: "A close photo of Alura at a table" },
+  { image: favoritePortrait, caption: "one I keep coming back to", alt: "A favorite portrait of Alura" },
+  { image: closePortrait, caption: "you, being you", alt: "A warm, close portrait of Alura" },
+  { image: blondePortrait, caption: "a few little versions of you", alt: "A playful photo strip of Alura" },
+  { image: smilingPortrait, caption: "one more for the album", alt: "A smiling portrait of Alura" },
+  { image: candidPortrait, caption: "a little candid", alt: "A candid portrait of Alura" },
+];
+
 export const reasons = [
   "The way you talk.",
   "The little things you do.",
@@ -59,37 +77,61 @@ export const reasons = [
   "The way you are simply... you.",
 ];
 
+export const relationshipStartDate = new Date(2026, 8, 6);
+export const relationshipDateLabel = [
+  String(relationshipStartDate.getDate()).padStart(2, "0"),
+  String(relationshipStartDate.getMonth() + 1).padStart(2, "0"),
+  String(relationshipStartDate.getFullYear()).slice(-2),
+].join(".");
+
+export const honestMessage: { text: string; kind?: "pause" | "signature" }[] = [
+  { text: "I'm sorry I haven't always been the best boyfriend." },
+  { text: "I know I still have a lot to learn." },
+  { text: "But I want you to know that I'm trying." },
+  { text: "I want to be better." },
+  { text: "Not just for a moment," },
+  { text: "but for you." },
+  { text: "I may not be the best yet,", kind: "pause" },
+  { text: "but I want to be." },
+  { text: "for you, Lura.", kind: "signature" },
+];
+
 export const ifWeWere = [
   {
     label: "a place",
     answer: "Somewhere by the sea, at golden hour — where we could stay a little longer.",
-    color: "#d8b79b",
+    color: "#291523",
   },
   {
     label: "a season",
     answer: "Early autumn. Soft light, slow afternoons, and your hand in mine.",
-    color: "#bd806c",
+    color: "#321522",
   },
   {
     label: "a song",
     answer: "Dinda, of course. A little melody that somehow sounds like you.",
-    color: "#98705f",
+    color: "#241322",
   },
   {
     label: "a memory",
     answer: "One of those ordinary days that became my favorite just because you were there.",
-    color: "#c58b81",
+    color: "#351722",
   },
   {
     label: "a color",
     answer: "The warm blush of the sky just before the sun goes down.",
-    color: "#d99c93",
+    color: "#2c1423",
   },
 ];
 
 export const personalLetter = [
-  "Dear Ghiscca,",
-  "[PLACEHOLDER FOR MY PERSONAL LETTER]",
-  "Thank you for being part of my life.",
-  "— Rifky",
+  `Dear ${recipientName},`,
+  "I'm sorry I haven't always been the boyfriend you deserve.",
+  "Sometimes I still don't know what I'm doing.",
+  "But I'm learning.",
+  "And I want to keep learning, with you.",
+  "I can't promise I'll always get everything right.",
+  "But I can promise that I'll keep trying to be better.",
+  "For you.",
+  `for you, ${recipientName === "Alura" ? "Lura" : recipientName}.`,
 ];

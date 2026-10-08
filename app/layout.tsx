@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "For Ghiscca — A Little Universe",
-  description: "A little universe, made with love for Ghiscca Alura Nazua.",
+  title: "For Alura — A Little Universe",
+  description: "A little universe made with love by Rifky, for Alura.",
   openGraph: {
-    title: "For Ghiscca — A Little Universe",
+    title: "For Alura — A Little Universe",
     description: "A digital love letter, made with love by Rifky.",
     type: "website",
   },
