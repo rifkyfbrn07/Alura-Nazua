@@ -1358,3 +1358,84 @@ a:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Interactive lily garden */
+.interactive-section {
+  position: relative;
+  overflow: hidden;
+  background: #f2e8df;
+}
+.interactive-title { max-width: 640px; margin: 0 auto 34px; text-align: center; }
+.interactive-title h2 { margin: 16px 0; color: var(--burgundy); font-family: Georgia, "Times New Roman", serif; font-size: clamp(54px, 8vw, 92px); line-height: .92; letter-spacing: -.06em; }
+.interactive-title h2 em { color: #9e6d69; font-size: .72em; }
+.interactive-title > p:last-child { max-width: 420px; margin: auto; color: #836e65; font-family: Georgia, "Times New Roman", serif; font-size: 16px; font-style: italic; }
+
+.lily-garden { position: relative; width: min(100%, 900px); min-height: 470px; margin: 0 auto; text-align: center; }
+.lily-garden-art { position: relative; width: 100%; height: 390px; overflow: hidden; border-radius: 48% 48% 18% 18%; background: radial-gradient(circle at 50% 68%, rgba(246, 231, 219, .9), transparent 55%), linear-gradient(180deg, #eadbd3 0%, #f5ece4 72%); }
+.garden-glow { position: absolute; left: 50%; top: 14%; width: 280px; height: 280px; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(circle, rgba(207, 154, 147, .26), transparent 68%); filter: blur(7px); }
+.garden-petal { position: absolute; width: 7px; height: 15px; border-radius: 70% 30% 65% 35%; background: #f9f2ea; opacity: .45; transform: rotate(18deg); box-shadow: 0 2px 5px rgba(120,80,75,.08); }
+.garden-heart { position: absolute; color: rgba(136, 86, 92, .45); font-family: Georgia, serif; font-size: 19px; will-change: transform; }
+.lily-bouquet { position: absolute; left: 50%; bottom: 18px; width: 320px; height: 330px; transform: translateX(-50%); }
+.lily-bundle { position: absolute; left: 50%; bottom: 0; width: 110px; height: 320px; transform-origin: bottom center; }
+.lily-bundle:nth-child(1) { transform: translateX(-135px) rotate(-8deg); }
+.lily-bundle:nth-child(2) { transform: translateX(-55px) rotate(1deg); z-index: 2; }
+.lily-bundle:nth-child(3) { transform: translateX(26px) rotate(8deg); }
+.lily-stem { position: absolute; left: 53px; bottom: 0; width: 4px; height: 235px; border-radius: 99px; background: linear-gradient(90deg,#61705a,#839674); transform-origin: bottom; }
+.seedling { position: absolute; left: 28px; bottom: 26px; width: 62px; height: 33px; border-radius: 100% 0 100% 0; background: #768768; transform: rotate(-18deg) scaleY(.9); }
+.lily-bud { position: absolute; left: 4px; top: 30px; width: 100px; height: 100px; transform: scale(.88) rotate(-2deg); }
+.lily-petal { position: absolute; left: 50%; top: 50%; width: 31px; height: 70px; border-radius: 62% 38% 58% 42%; background: linear-gradient(145deg,#fffdfa,#efe3da); opacity: .88; transform-origin: 50% 90%; transform: translate(-50%, -50%) scale(.16) rotate(0deg); box-shadow: inset 0 -7px 14px rgba(172, 118, 113, .08); }
+.lily-bud .p1 { transform: translate(-50%,-50%) rotate(0deg) scale(.85); }
+.lily-bud .p2 { transform: translate(-50%,-50%) rotate(72deg) scale(.85); }
+.lily-bud .p3 { transform: translate(-50%,-50%) rotate(144deg) scale(.85); }
+.lily-bud .p4 { transform: translate(-50%,-50%) rotate(216deg) scale(.85); }
+.lily-bud .p5 { transform: translate(-50%,-50%) rotate(288deg) scale(.85); }
+.lily-center { position:absolute; left:50%; top:50%; width:22px; height:22px; border-radius:50%; background:#d9ab76; transform:translate(-50%,-50%) scale(.2); opacity:0; box-shadow:0 0 0 5px rgba(216,171,118,.13); }
+.water-button, .petal-launch {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  margin-top: 14px; min-height: 44px; padding: 12px 18px;
+  border: 1px solid rgba(116,61,70,.35); background: rgba(255,250,244,.35); color: var(--burgundy);
+  cursor: pointer; letter-spacing: .11em; font-size: 8px;
+}
+.water-button:disabled, .petal-launch.is-done { opacity: .6; cursor: default; }
+.water-drops, .burst-layer, .petal-game-layer { position: fixed; inset: 0; pointer-events: none; z-index: 80; overflow: hidden; }
+.water-drop { position:absolute; top:18%; width:8px; height:14px; border-radius:60% 60% 70% 70%; background:#c7ddea; opacity:0; }
+.lily-garden-caption { margin-top: 14px; color:#957c72; font-family: Georgia, serif; font-size:14px; font-style:italic; }
+.burst-particle, .game-petal { position:absolute; color:#a76e73; font-family: Georgia, serif; pointer-events:none; will-change: transform, opacity; }
+.heart-game { max-width: 900px; margin: 80px auto 0; }
+.heart-game-copy { transform: translateY(20px); opacity:0; text-align:center; }
+.heart-game-copy h3 { margin: 13px 0 6px; color:#5f403d; font-family:Georgia,serif; font-size:clamp(30px,4vw,44px); font-weight:400; }
+.heart-game-copy p:last-child { color:#8d766b; font-family:Georgia,serif; font-style:italic; }
+.heart-field { position:relative; min-height:290px; margin-top:20px; border:1px solid rgba(130,91,84,.12); background:rgba(255,249,243,.32); overflow:hidden; }
+.game-heart { position:absolute; min-width:48px; min-height:48px; border:0; background:transparent; color:#9b5e68; cursor:pointer; font-family:Georgia,serif; font-size:34px; transition:transform .25s ease; }
+.game-heart:hover { transform:scale(1.16); }
+.game-heart.is-caught { pointer-events:none; opacity:0; transform:scale(1.7); }
+.petal-game { display:flex; align-items:center; justify-content:space-between; gap:28px; max-width:900px; margin:74px auto 0; padding-top:34px; border-top:1px solid rgba(120,84,77,.12); }
+.petal-game h3 { margin:8px 0; color:#5f403d; font-family:Georgia,serif; font-size:32px; font-weight:400; }
+.petal-game p:last-child { margin:0; color:#8d766b; font-family:Georgia,serif; font-size:15px; font-style:italic; }
+.hero-botanical { position:absolute; z-index:2; width:150px; height:280px; pointer-events:none; }
+.hero-lily { right:7%; bottom:4%; }
+.hero-botanical .stem { position:absolute; right:56px; bottom:0; width:4px; height:190px; border-radius:99px; background:#718168; transform:rotate(-10deg); transform-origin:bottom; }
+.hero-botanical .flower { position:absolute; right:6px; top:15px; color:#fff9f2; font-family:Georgia,serif; font-size:82px; text-shadow:0 8px 18px rgba(48,30,27,.18); }
+.hero-botanical .leaf { position:absolute; width:72px; height:24px; border-radius:100% 0 100% 0; background:#788b73; }
+.hero-botanical .l1 { right:52px; bottom:68px; transform:rotate(-23deg); }
+.hero-botanical .l2 { right:2px; bottom:92px; transform:rotate(24deg); }
+.intro-botanical { position:absolute; z-index:0; width:130px; height:240px; bottom:-12px; opacity:.7; }
+.intro-lily-left { left:8%; transform:rotate(-11deg); }
+.intro-lily-right { right:8%; transform:scaleX(-1) rotate(-11deg); }
+.intro-botanical .stem { position:absolute; left:64px; bottom:0; width:3px; height:170px; background:#718168; }
+.intro-botanical .flower { position:absolute; top:18px; left:18px; color:#fff7f1; font-family:Georgia,serif; font-size:66px; }
+.intro-botanical .leaf { position:absolute; width:62px; height:21px; border-radius:100% 0 100% 0; background:#6e836b; }
+.intro-botanical .l1 { left:13px; bottom:55px; transform:rotate(-23deg); }
+.intro-botanical .l2 { left:61px; bottom:82px; transform:rotate(23deg); }
+
+@media (max-width: 650px) {
+  .interactive-section { padding-top: 86px; }
+  .lily-garden { min-height: 400px; }
+  .lily-garden-art { height: 320px; border-radius: 40% 40% 14% 14%; }
+  .lily-bouquet { transform: translateX(-50%) scale(.82); transform-origin: bottom center; bottom: 8px; }
+  .heart-field { min-height: 230px; }
+  .petal-game { flex-direction:column; align-items:flex-start; }
+  .hero-lily { right:-15px; bottom:0; transform:scale(.76); transform-origin:bottom right; opacity:.65; }
+  .intro-botanical { transform:scale(.7) rotate(-11deg); transform-origin:bottom; }
+  .intro-lily-right { transform:scaleX(-1) scale(.7) rotate(-11deg); }
+}
