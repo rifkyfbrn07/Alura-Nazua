@@ -1,359 +1,446 @@
-// 12 Original Interactive Photobooth Frames for Alura's Pink Photobooth
-// Each frame has distinct SVG preview elements and native Canvas 2D drawing routines for high-res PNG export.
+// 15 Professional Photobox & Instagram-Style Frames for Alura's Pink Photobooth Studio
+// Clean, elegant, Korean photobox aesthetics. Photos are always the primary attraction.
 
-export type FrameCategory = "all" | "cute" | "floral" | "vintage" | "romantic" | "celebration";
-
-export type PhotoboothFrame = {
-  id: string;
-  name: string;
-  category: "cute" | "floral" | "vintage" | "romantic" | "celebration";
-  bgColor: string;
-  borderColor: string;
-  accentColor: string;
-  textColor: string;
-  tagline: string;
-  thumbnailEmoji: string;
-  badge: string;
-};
+import { PhotoboothFrame, FrameCategory } from "./types";
+import { LayoutConfig } from "./layouts";
 
 export const PHOTOBOOTH_FRAMES: PhotoboothFrame[] = [
+  // ─── CATEGORY A — CLASSIC PHOTOBOX ─────────────────────────────────────────
   {
-    id: "classic-pink",
-    name: "Classic Pink",
-    category: "romantic",
-    bgColor: "#FFF5F7",
-    borderColor: "#F4D1D5",
-    accentColor: "#A94F65",
-    textColor: "#702C43",
-    tagline: "Soft pastel elegance",
-    thumbnailEmoji: "🌸",
-    badge: "Classic",
-  },
-  {
-    id: "coquette-ribbon",
-    name: "Coquette Ribbon",
-    category: "cute",
-    bgColor: "#FFF0F2",
-    borderColor: "#E8B5C0",
-    accentColor: "#A94F65",
-    textColor: "#702C43",
-    tagline: "Delicate satin bows & ribbons",
-    thumbnailEmoji: "🎀",
-    badge: "Popular",
-  },
-  {
-    id: "lily-garden",
-    name: "Lily Garden",
-    category: "floral",
-    bgColor: "#FFF7F5",
-    borderColor: "#D58C9C",
-    accentColor: "#A94F65",
-    textColor: "#702C43",
-    tagline: "Alura's signature blooming lilies",
-    thumbnailEmoji: "🌷",
-    badge: "Signature",
-  },
-  {
-    id: "butterfly-dream",
-    name: "Butterfly Dream",
-    category: "romantic",
-    bgColor: "#FCE8E8",
-    borderColor: "#E8B5C0",
-    accentColor: "#A94F65",
-    textColor: "#702C43",
-    tagline: "Fluttering pastel butterflies & stardust",
-    thumbnailEmoji: "🦋",
-    badge: "Soft",
-  },
-  {
-    id: "retro-photobooth",
-    name: "Retro Photobooth",
-    category: "vintage",
-    bgColor: "#F4D1D5",
-    borderColor: "#702C43",
-    accentColor: "#702C43",
-    textColor: "#FFFFFF",
-    tagline: "Vintage arcade photo strip vibes",
-    thumbnailEmoji: "🎞️",
-    badge: "Retro",
-  },
-  {
-    id: "vintage-film",
-    name: "Vintage Film",
-    category: "vintage",
-    bgColor: "#2A1820",
-    borderColor: "#D58C9C",
-    accentColor: "#E5A93C",
-    textColor: "#FFF0F2",
-    tagline: "Dark 35mm film perforations & orange stamps",
-    thumbnailEmoji: "🎬",
-    badge: "Analog",
-  },
-  {
-    id: "love-letter",
-    name: "Love Letter",
-    category: "romantic",
-    bgColor: "#FFFDFB",
-    borderColor: "#F4D1D5",
-    accentColor: "#A94F65",
-    textColor: "#702C43",
-    tagline: "Airmail trims & wax seal imprint",
-    thumbnailEmoji: "💌",
-    badge: "Letter",
-  },
-  {
-    id: "strawberry-milk",
-    name: "Strawberry Milk",
-    category: "cute",
-    bgColor: "#FFEBF0",
-    borderColor: "#FFB3C6",
-    accentColor: "#FB6F92",
-    textColor: "#702C43",
-    tagline: "Sweet cream and strawberry gingham",
-    thumbnailEmoji: "🍓",
-    badge: "Sweet",
-  },
-  {
-    id: "cloud-nine",
-    name: "Cloud Nine",
-    category: "cute",
-    bgColor: "#F0F4FF",
-    borderColor: "#D4E0FF",
-    accentColor: "#7A9CE6",
-    textColor: "#34495E",
-    tagline: "Fluffy pastel clouds & crescent moon",
-    thumbnailEmoji: "☁️",
-    badge: "Dreamy",
-  },
-  {
-    id: "birthday-special",
-    name: "Birthday Special",
-    category: "celebration",
-    bgColor: "#FFF9E6",
-    borderColor: "#FCE8E8",
-    accentColor: "#A94F65",
-    textColor: "#702C43",
-    tagline: "Party confetti, sparkles & celebration bows",
-    thumbnailEmoji: "🎂",
-    badge: "Festive",
-  },
-  {
-    id: "polaroid-memories",
-    name: "Polaroid Memories",
-    category: "vintage",
+    id: "classic-white",
+    name: "Classic White",
+    category: "classic",
+    description: "Crisp pure white photobox borders with minimalist Korean typography",
     bgColor: "#FFFFFF",
-    borderColor: "#E8B5C0",
-    accentColor: "#A94F65",
-    textColor: "#702C43",
-    tagline: "Authentic white Polaroid frame & tape",
-    thumbnailEmoji: "📷",
-    badge: "Minimal",
+    textColor: "#1A1A1A",
+    subtextColor: "#8E8E93",
+    borderColor: "#F0F0F2",
+    headerText: "LIFE FOUR CUTS",
+    footerText: "ALURA × RIFKY • MEMORY STUDIO",
+    accentStyle: "minimal",
+    previewBg: "#FFFFFF",
   },
   {
-    id: "our-little-world",
-    name: "Our Little World",
-    category: "floral",
-    bgColor: "#FFF0F2",
-    borderColor: "#A94F65",
-    accentColor: "#702C43",
-    textColor: "#702C43",
-    tagline: "Lilies, ribbons, butterflies & scrapbook memories",
-    thumbnailEmoji: "✨",
-    badge: "Special",
-  },
-];
-
-export type LiveCameraFilter = {
-  id: string;
-  name: string;
-  css: string;
-  canvasApply: (ctx: CanvasRenderingContext2D, width: number, height: number) => void;
-};
-
-export const CAMERA_FILTERS: LiveCameraFilter[] = [
-  {
-    id: "original",
-    name: "Original",
-    css: "none",
-    canvasApply: () => {},
-  },
-  {
-    id: "softPink",
+    id: "soft-pink",
     name: "Soft Pink",
-    css: "sepia(0.12) saturate(1.18) hue-rotate(318deg) brightness(1.04)",
-    canvasApply: (ctx, w, h) => {
-      ctx.fillStyle = "rgba(252, 232, 232, 0.16)";
-      ctx.fillRect(0, 0, w, h);
-    },
+    category: "classic",
+    description: "Gentle blush pink border with delicate rose typography",
+    bgColor: "#FFF5F7",
+    textColor: "#702C43",
+    subtextColor: "#A94F65",
+    borderColor: "#F4D1D5",
+    headerText: "ALURA'S PHOTO STUDIO",
+    footerText: "BLOOMING WITH SWEET MEMORIES",
+    accentStyle: "korean-cut",
+    previewBg: "#FFF5F7",
   },
   {
-    id: "warmVintage",
-    name: "Warm Vintage",
-    css: "sepia(0.32) contrast(0.96) brightness(1.05) saturate(1.1)",
-    canvasApply: (ctx, w, h) => {
-      ctx.fillStyle = "rgba(244, 209, 213, 0.14)";
-      ctx.fillRect(0, 0, w, h);
-    },
+    id: "korean-four-cut",
+    name: "Korean Four Cut",
+    category: "classic",
+    description: "Modern Haru Film dark charcoal photobox strip with numbered badges",
+    bgColor: "#16191E",
+    textColor: "#F8FAFC",
+    subtextColor: "#94A3B8",
+    borderColor: "#2D3748",
+    headerText: "HARU FOUR CUTS // STUDIO",
+    footerText: "ALURA & RIFKY • SPECIAL ARCHIVE",
+    accentStyle: "korean-cut",
+    previewBg: "#16191E",
   },
   {
-    id: "dreamy",
-    name: "Dreamy",
-    css: "brightness(1.08) contrast(0.92) saturate(1.15)",
-    canvasApply: (ctx, w, h) => {
-      ctx.fillStyle = "rgba(255, 255, 255, 0.08)";
-      ctx.fillRect(0, 0, w, h);
-    },
+    id: "vintage-black",
+    name: "Vintage Black",
+    category: "classic",
+    description: "Sleek matte black border with timeless cinematic typography",
+    bgColor: "#0D0D0E",
+    textColor: "#FFFFFF",
+    subtextColor: "#A1A1AA",
+    borderColor: "#27272A",
+    headerText: "THE ARCHIVE // NO. 26",
+    footerText: "A DAY TO REMEMBER FOREVER",
+    accentStyle: "minimal",
+    previewBg: "#0D0D0E",
   },
   {
-    id: "softGlow",
-    name: "Soft Glow",
-    css: "contrast(0.94) brightness(1.06) saturate(1.08)",
-    canvasApply: (ctx, w, h) => {
-      ctx.fillStyle = "rgba(255, 240, 242, 0.12)";
-      ctx.fillRect(0, 0, w, h);
-    },
+    id: "cream-film",
+    name: "Cream Film",
+    category: "classic",
+    description: "Warm ivory cream paper with analog orange date stamp & film notch",
+    bgColor: "#FAF7F0",
+    textColor: "#4A3B32",
+    subtextColor: "#8C7A6B",
+    borderColor: "#EADFCF",
+    headerText: "35MM ANALOG MEMORY",
+    footerText: "KODAK PORTRA 400 • '26 11 10",
+    accentStyle: "film-sheet",
+    previewBg: "#FAF7F0",
   },
   {
-    id: "blackAndWhite",
-    name: "Black & White",
-    css: "grayscale(1) contrast(1.1) brightness(1.02)",
-    canvasApply: (ctx, w, h) => {
-      const imgData = ctx.getImageData(0, 0, w, h);
-      const d = imgData.data;
-      for (let i = 0; i < d.length; i += 4) {
-        const v = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
-        d[i] = v;
-        d[i + 1] = v;
-        d[i + 2] = v;
-      }
-      ctx.putImageData(imgData, 0, 0);
-    },
+    id: "retro-booth",
+    name: "Retro Booth",
+    category: "classic",
+    description: "Classic 1970s arcade photostrip cardstock with hairline divider trims",
+    bgColor: "#F3EDE2",
+    textColor: "#2B2620",
+    subtextColor: "#6E6255",
+    borderColor: "#D9CDBF",
+    headerText: "PHOTO AUTOMAT BOOTH",
+    footerText: "SAN FRANCISCO • AUTOMATIC PORTRAITS",
+    accentStyle: "sprockets",
+    previewBg: "#F3EDE2",
+  },
+
+  // ─── CATEGORY B — INSTAGRAM STYLE ──────────────────────────────────────────
+  {
+    id: "instagram-story",
+    name: "Instagram Story",
+    category: "instagram",
+    description: "9:16 portrait story frame with real story header and minimalist footer",
+    bgColor: "#050505",
+    textColor: "#FFFFFF",
+    subtextColor: "#A8A8A8",
+    borderColor: "#262626",
+    headerText: "ghiscca.alura",
+    footerText: "Send message...",
+    accentStyle: "instagram-ui",
+    previewBg: "#050505",
   },
   {
-    id: "retroFilm",
-    name: "Retro Film",
-    css: "sepia(0.24) contrast(1.04) brightness(0.98) saturate(0.88)",
-    canvasApply: (ctx, w, h) => {
-      ctx.fillStyle = "rgba(232, 181, 192, 0.12)";
-      ctx.fillRect(0, 0, w, h);
-    },
+    id: "photo-dump",
+    name: "Photo Dump",
+    category: "instagram",
+    description: "Casual lifestyle photo dump with clean washi-tape corners & date",
+    bgColor: "#FAF8F5",
+    textColor: "#2D2A26",
+    subtextColor: "#8A847C",
+    borderColor: "#ECE6DD",
+    headerText: "LITTLE MOMENTS DUMP",
+    footerText: "a gentle collection of ordinary days with you",
+    accentStyle: "photo-dump",
+    previewBg: "#FAF8F5",
+  },
+  {
+    id: "minimal-grid",
+    name: "Minimal Grid",
+    category: "instagram",
+    description: "Ultra-clean Scandinavian layout with hairline grid lines & micro-labels",
+    bgColor: "#FFFFFF",
+    textColor: "#0F172A",
+    subtextColor: "#64748B",
+    borderColor: "#E2E8F0",
+    headerText: "SERIES 01 // GHISCCA ALURA",
+    footerText: "CURATED BY RIFKY • ALL RIGHTS RESERVED",
+    accentStyle: "minimal",
+    previewBg: "#FFFFFF",
+  },
+  {
+    id: "editorial-collage",
+    name: "Editorial Collage",
+    category: "instagram",
+    description: "Fashion editorial magazine spread with bold serif masthead",
+    bgColor: "#F8F6F2",
+    textColor: "#18181B",
+    subtextColor: "#71717A",
+    borderColor: "#E4E0D6",
+    headerText: "L'ARCHIVE D'ALURA",
+    footerText: "ISSUE NO. 11 // SWEETEST SMILE",
+    accentStyle: "editorial",
+    previewBg: "#F8F6F2",
+  },
+  {
+    id: "polaroid-stack",
+    name: "Polaroid Stack",
+    category: "instagram",
+    description: "Crisp white Polaroid cardstock with generous bottom handwriting margin",
+    bgColor: "#FAFAFA",
+    textColor: "#3F3F46",
+    subtextColor: "#71717A",
+    borderColor: "#E4E4E7",
+    headerText: "POLAROID ORIGINAL",
+    footerText: "my favorite person in the world",
+    accentStyle: "polaroid",
+    previewBg: "#FAFAFA",
+  },
+  {
+    id: "contact-sheet",
+    name: "Contact Sheet",
+    category: "instagram",
+    description: "35mm dark contact proof sheet with frame numbers & orange film stamps",
+    bgColor: "#141416",
+    textColor: "#E4E4E7",
+    subtextColor: "#E5A93C",
+    borderColor: "#27272A",
+    headerText: "KODAK PORTRA 400 // CONTACT SHEET",
+    footerText: "▶ 24A • 25 • 25A • 26 ◀",
+    accentStyle: "contact-sheet",
+    previewBg: "#141416",
+  },
+
+  // ─── CATEGORY C — CUTE & COQUETTE ──────────────────────────────────────────
+  {
+    id: "coquette-pink",
+    name: "Coquette Pink",
+    category: "coquette",
+    description: "Soft blush pink frame with tiny elegant vector bows in the outer corners",
+    bgColor: "#FFF2F5",
+    textColor: "#702C43",
+    subtextColor: "#A94F65",
+    borderColor: "#F4D1D5",
+    headerText: "COQUETTE CLUB // ALURA",
+    footerText: "sweet ribbon days & pretty smiles",
+    accentStyle: "coquette-bows",
+    previewBg: "#FFF2F5",
+  },
+  {
+    id: "baby-pink-film",
+    name: "Baby Pink Film",
+    category: "coquette",
+    description: "Pastel baby pink film strip with subtle analog sprockets in soft rose",
+    bgColor: "#FFEBF0",
+    textColor: "#80354E",
+    subtextColor: "#B35B76",
+    borderColor: "#F7CAD7",
+    headerText: "BABY PINK 35MM",
+    footerText: "SOFT MEMORIES // LITTLE LILY WORLD",
+    accentStyle: "sprockets",
+    previewBg: "#FFEBF0",
+  },
+  {
+    id: "lily-signature",
+    name: "Lily Signature",
+    category: "coquette",
+    description: "Minimalist ivory frame with a delicate tiny line-art lily flower emblem at the bottom",
+    bgColor: "#FFFDFB",
+    textColor: "#542031",
+    subtextColor: "#8F3A53",
+    borderColor: "#F0DFE3",
+    headerText: "ALURA'S LITTLE LILY WORLD",
+    footerText: "blooming softly every day",
+    accentStyle: "lily-signature",
+    previewBg: "#FFFDFB",
   },
 ];
 
-// Helper to draw customized decorative frame overlays onto Canvas 2D
-export function drawPhotoboothDecorations(
-  ctx: CanvasRenderingContext2D,
-  frame: PhotoboothFrame,
-  canvasWidth: number,
-  canvasHeight: number,
-  options: {
-    caption: string;
-    showDate: boolean;
-    displayDate: string;
-    borderThickness: number;
-    showDecorations: boolean;
-  }
-) {
-  const { caption, showDate, displayDate, borderThickness, showDecorations } = options;
-  const padding = borderThickness;
+export const FRAME_CATEGORIES: { id: FrameCategory; name: string }[] = [
+  { id: "all", name: "All Frames (15)" },
+  { id: "classic", name: "Classic Photobox" },
+  { id: "instagram", name: "Instagram Style" },
+  { id: "coquette", name: "Cute & Coquette" },
+];
 
+/**
+ * Helper to draw tiny delicate vector ribbon bow on Canvas 2D
+ */
+function drawVectorBow(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number, color: string) {
   ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 1.6;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
 
-  // 1. Outer Frame Stroke
-  ctx.strokeStyle = frame.borderColor;
-  ctx.lineWidth = borderThickness;
-  ctx.strokeRect(padding / 2, padding / 2, canvasWidth - padding, canvasHeight - padding);
+  // Center knot
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, size * 0.16, size * 0.14, 0, 0, Math.PI * 2);
+  ctx.fill();
 
-  // 2. Specific frame decorations based on frame ID
-  if (showDecorations) {
-    if (frame.id === "coquette-ribbon") {
-      ctx.font = "32px sans-serif";
-      ctx.fillText("🎀", 28, 48);
-      ctx.fillText("🎀", canvasWidth - 58, 48);
-      ctx.fillText("🎀", 28, canvasHeight - 50);
-      ctx.fillText("🎀", canvasWidth - 58, canvasHeight - 50);
-    } else if (frame.id === "lily-garden") {
-      ctx.font = "34px sans-serif";
-      ctx.fillText("🌷", 24, 52);
-      ctx.fillText("🌷", canvasWidth - 60, 52);
-      ctx.fillText("🌸", 24, canvasHeight - 48);
-      ctx.fillText("🌷", canvasWidth - 60, canvasHeight - 48);
-    } else if (frame.id === "butterfly-dream") {
-      ctx.font = "30px sans-serif";
-      ctx.fillText("🦋", 28, 50);
-      ctx.fillText("✨", canvasWidth - 50, 48);
-      ctx.fillText("✨", 32, canvasHeight - 50);
-      ctx.fillText("🦋", canvasWidth - 60, canvasHeight - 50);
-    } else if (frame.id === "retro-photobooth") {
-      // Film sprocket perforations along sides
-      ctx.fillStyle = frame.borderColor;
-      const count = Math.floor(canvasHeight / 48);
-      for (let i = 1; i < count; i++) {
-        ctx.fillRect(8, i * 48, 12, 22);
-        ctx.fillRect(canvasWidth - 20, i * 48, 12, 22);
-      }
-    } else if (frame.id === "vintage-film") {
-      // Film edge numbers
-      ctx.font = "bold 14px monospace";
-      ctx.fillStyle = "#E5A93C";
-      ctx.fillText("▶ 35MM KODAK 400", 28, 30);
-      ctx.fillText("FRAME #04 ◀", canvasWidth - 140, 30);
-    } else if (frame.id === "love-letter") {
-      // Airmail border dashes
-      ctx.strokeStyle = "#A94F65";
-      ctx.setLineDash([14, 8]);
-      ctx.lineWidth = 4;
-      ctx.strokeRect(14, 14, canvasWidth - 28, canvasHeight - 28);
-      ctx.setLineDash([]);
-      ctx.font = "28px sans-serif";
-      ctx.fillText("💌", canvasWidth - 52, 48);
-    } else if (frame.id === "strawberry-milk") {
-      ctx.font = "28px sans-serif";
-      ctx.fillText("🍓", 28, 48);
-      ctx.fillText("🍓", canvasWidth - 54, 48);
-    } else if (frame.id === "cloud-nine") {
-      ctx.font = "28px sans-serif";
-      ctx.fillText("☁️", 28, 48);
-      ctx.fillText("⭐", canvasWidth - 52, 48);
-      ctx.fillText("🌙", 28, canvasHeight - 50);
-    } else if (frame.id === "birthday-special") {
-      ctx.font = "28px sans-serif";
-      ctx.fillText("🎉", 28, 48);
-      ctx.fillText("🎂", canvasWidth - 54, 48);
-      ctx.fillText("✨", canvasWidth / 2 - 14, 48);
-    } else if (frame.id === "polaroid-memories") {
-      // Washi tape at top
-      ctx.fillStyle = "rgba(244, 209, 213, 0.8)";
-      ctx.fillRect(canvasWidth / 2 - 60, 10, 120, 26);
-    } else if (frame.id === "our-little-world") {
-      ctx.font = "28px sans-serif";
-      ctx.fillText("🌷", 24, 48);
-      ctx.fillText("🎀", canvasWidth - 52, 48);
-      ctx.fillText("🦋", 24, canvasHeight - 50);
-      ctx.fillText("✨", canvasWidth - 50, canvasHeight - 50);
-    }
-  }
+  // Left loop
+  ctx.beginPath();
+  ctx.moveTo(cx - size * 0.1, cy);
+  ctx.bezierCurveTo(cx - size * 0.7, cy - size * 0.6, cx - size * 0.9, cy + size * 0.3, cx - size * 0.1, cy + size * 0.1);
+  ctx.stroke();
 
-  // 3. Header Stamp
-  ctx.textAlign = "center";
-  ctx.font = "bold 13px monospace";
-  ctx.fillStyle = frame.accentColor;
-  ctx.fillText("ALURA'S PINK PHOTOBOOTH // MEMORY STRIP", canvasWidth / 2, padding + 18);
+  // Right loop
+  ctx.beginPath();
+  ctx.moveTo(cx + size * 0.1, cy);
+  ctx.bezierCurveTo(cx + size * 0.7, cy - size * 0.6, cx + size * 0.9, cy + size * 0.3, cx + size * 0.1, cy + size * 0.1);
+  ctx.stroke();
 
-  // 4. Footer Caption and Date
-  const bottomY = canvasHeight - 38;
-  if (caption) {
-    ctx.font = "italic 20px Georgia, serif";
-    ctx.fillStyle = frame.textColor;
-    ctx.fillText(`“${caption}”`, canvasWidth / 2, bottomY - 24);
-  }
+  // Left ribbon tail
+  ctx.beginPath();
+  ctx.moveTo(cx - size * 0.08, cy + size * 0.12);
+  ctx.quadraticCurveTo(cx - size * 0.45, cy + size * 0.6, cx - size * 0.55, cy + size * 0.85);
+  ctx.stroke();
 
-  if (showDate) {
-    ctx.font = "12px monospace";
-    ctx.fillStyle = frame.accentColor;
-    ctx.fillText(displayDate.toUpperCase(), canvasWidth / 2, bottomY);
-  }
+  // Right ribbon tail
+  ctx.beginPath();
+  ctx.moveTo(cx + size * 0.08, cy + size * 0.12);
+  ctx.quadraticCurveTo(cx + size * 0.45, cy + size * 0.6, cx + size * 0.55, cy + size * 0.85);
+  ctx.stroke();
 
   ctx.restore();
 }
 
+/**
+ * Helper to draw tiny minimalist vector lily emblem on Canvas 2D
+ */
+function drawVectorLilyEmblem(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number, color: string) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  // Center petal
+  ctx.beginPath();
+  ctx.moveTo(cx, cy + size * 0.5);
+  ctx.bezierCurveTo(cx - size * 0.25, cy + size * 0.1, cx - size * 0.2, cy - size * 0.5, cx, cy - size * 0.65);
+  ctx.bezierCurveTo(cx + size * 0.2, cy - size * 0.5, cx + size * 0.25, cy + size * 0.1, cx, cy + size * 0.5);
+  ctx.stroke();
+
+  // Left flared petal
+  ctx.beginPath();
+  ctx.moveTo(cx, cy + size * 0.4);
+  ctx.bezierCurveTo(cx - size * 0.4, cy + size * 0.1, cx - size * 0.7, cy - size * 0.15, cx - size * 0.65, cy - size * 0.45);
+  ctx.stroke();
+
+  // Right flared petal
+  ctx.beginPath();
+  ctx.moveTo(cx, cy + size * 0.4);
+  ctx.bezierCurveTo(cx + size * 0.4, cy + size * 0.1, cx + size * 0.7, cy - size * 0.15, cx + size * 0.65, cy - size * 0.45);
+  ctx.stroke();
+
+  // Delicate stamen dots
+  ctx.beginPath();
+  ctx.arc(cx - size * 0.15, cy - size * 0.35, 1.5, 0, Math.PI * 2);
+  ctx.arc(cx, cy - size * 0.45, 1.5, 0, Math.PI * 2);
+  ctx.arc(cx + size * 0.15, cy - size * 0.35, 1.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+/**
+ * Master Canvas 2D Photobox Frame Renderer:
+ * Renders high-res borders, professional typography, stamps, sprockets, and subtle accents.
+ */
+export function drawPhotoboxFrame(
+  ctx: CanvasRenderingContext2D,
+  frame: PhotoboothFrame,
+  layout: LayoutConfig,
+  canvasW: number,
+  canvasH: number,
+  options: {
+    customCaption?: string;
+    showDate?: boolean;
+    displayDate?: string;
+    borderThickness?: number;
+  }
+) {
+  const { customCaption, showDate = true, displayDate, borderThickness = 12 } = options;
+  const isDark = frame.id === "korean-four-cut" || frame.id === "vintage-black" || frame.id === "instagram-story" || frame.id === "contact-sheet";
+
+  ctx.save();
+
+  // 1. Outer Border Line if applicable
+  if (borderThickness > 0) {
+    ctx.strokeStyle = frame.borderColor;
+    ctx.lineWidth = borderThickness;
+    ctx.strokeRect(borderThickness / 2, borderThickness / 2, canvasW - borderThickness, canvasH - borderThickness);
+  }
+
+  // 2. Specific Accent Styles
+  if (frame.accentStyle === "coquette-bows") {
+    // 4 Tiny elegant vector bows in corners
+    const bowSize = 26;
+    const margin = borderThickness + 24;
+    drawVectorBow(ctx, margin, margin, bowSize, frame.subtextColor);
+    drawVectorBow(ctx, canvasW - margin, margin, bowSize, frame.subtextColor);
+    drawVectorBow(ctx, margin, canvasH - margin, bowSize, frame.subtextColor);
+    drawVectorBow(ctx, canvasW - margin, canvasH - margin, bowSize, frame.subtextColor);
+  } else if (frame.accentStyle === "sprockets") {
+    // Elegant analog film perforations on edges
+    ctx.fillStyle = frame.borderColor;
+    const count = Math.floor(canvasH / 54);
+    for (let i = 1; i < count; i++) {
+      const y = i * 54;
+      ctx.fillRect(8, y, 10, 18);
+      ctx.fillRect(canvasW - 18, y, 10, 18);
+    }
+  } else if (frame.accentStyle === "contact-sheet") {
+    // Film frame numbers & Kodak Portra stamps
+    ctx.font = "bold 13px 'Courier New', monospace";
+    ctx.fillStyle = "#E5A93C";
+    ctx.textAlign = "left";
+    ctx.fillText("▶ 35MM KODAK 400", 28, 28);
+    ctx.textAlign = "right";
+    ctx.fillText("FRAME #26 ◀", canvasW - 28, 28);
+  } else if (frame.accentStyle === "photo-dump") {
+    // Delicate washi tape accents on top corners
+    ctx.fillStyle = "rgba(229, 215, 218, 0.75)";
+    ctx.save();
+    ctx.translate(canvasW * 0.15, 14);
+    ctx.rotate(-0.06);
+    ctx.fillRect(-35, -7, 70, 14);
+    ctx.restore();
+    ctx.save();
+    ctx.translate(canvasW * 0.85, 14);
+    ctx.rotate(0.06);
+    ctx.fillRect(-35, -7, 70, 14);
+    ctx.restore();
+  }
+
+  // 3. Header Typography
+  ctx.textAlign = "center";
+  if (frame.accentStyle === "instagram-ui") {
+    // Instagram Story Header
+    const headY = 44;
+    // Avatar circle
+    ctx.fillStyle = "#E1306C";
+    ctx.beginPath();
+    ctx.arc(42, headY, 14, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#FFFFFF";
+    ctx.font = "bold 12px sans-serif";
+    ctx.fillText("G", 42, headY + 4);
+
+    // Username & timestamp
+    ctx.textAlign = "left";
+    ctx.font = "bold 13px sans-serif";
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillText(frame.headerText, 66, headY + 1);
+    ctx.font = "12px sans-serif";
+    ctx.fillStyle = "#8E8E93";
+    ctx.fillText("•  Just now", 175, headY + 1);
+
+    // 3 dots
+    ctx.textAlign = "right";
+    ctx.font = "bold 18px sans-serif";
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillText("•••", canvasW - 32, headY + 4);
+  } else {
+    // Standard Photobox Header
+    const headY = Math.max(34, canvasH * (layout.headerSpace * 0.01 * 0.65));
+    ctx.font = "600 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    ctx.letterSpacing = "2px";
+    ctx.fillStyle = frame.subtextColor;
+    ctx.fillText(frame.headerText.toUpperCase(), canvasW / 2, headY);
+  }
+
+  // 4. Footer Typography / Lily Emblem
+  const footerY = canvasH - Math.max(28, canvasH * (layout.footerSpace * 0.01 * 0.45));
+
+  if (frame.accentStyle === "lily-signature") {
+    // Tiny elegant line-art lily emblem above caption
+    drawVectorLilyEmblem(ctx, canvasW / 2, footerY - 24, 22, frame.subtextColor);
+  }
+
+  // Caption text (custom or frame preset)
+  const activeCaption = customCaption?.trim() || frame.footerText;
+  ctx.textAlign = "center";
+  ctx.font = "italic 16px Georgia, serif";
+  ctx.fillStyle = frame.textColor;
+  ctx.fillText(activeCaption, canvasW / 2, footerY);
+
+  // Date stamp
+  if (showDate && displayDate) {
+    ctx.font = "11px 'Courier New', monospace";
+    ctx.letterSpacing = "1px";
+    ctx.fillStyle = frame.subtextColor;
+    ctx.fillText(displayDate.toUpperCase(), canvasW / 2, footerY + 20);
+  }
+
+  ctx.restore();
+}
