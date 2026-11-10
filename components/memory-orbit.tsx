@@ -55,6 +55,8 @@ export default function MemoryOrbit() {
   const particlesRef = useRef<Particle[]>([]);
   const burstPetalsRef = useRef<BurstPetal[]>([]);
   const ripplesRef = useRef<{ radius: number; maxRadius: number; alpha: number }[]>([]);
+  const isVisibleRef = useRef<boolean>(true);
+  const dimsRef = useRef<{ w: number; h: number }>({ w: 800, h: 500 });
 
   useEffect(() => {
     const q = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -62,6 +64,34 @@ export default function MemoryOrbit() {
     const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
     q.addEventListener("change", handler);
     return () => q.removeEventListener("change", handler);
+  }, []);
+
+  // Pause heavy canvas and 3D calculations when offscreen
+  useEffect(() => {
+    const world = worldRef.current;
+    if (!world || typeof IntersectionObserver === "undefined") return;
+
+    const updateDims = () => {
+      const rect = world.getBoundingClientRect();
+      dimsRef.current = { w: rect.width || 800, h: rect.height || 500 };
+    };
+    updateDims();
+    window.addEventListener("resize", updateDims, { passive: true });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          isVisibleRef.current = entry.isIntersecting;
+        });
+      },
+      { rootMargin: "150px" }
+    );
+
+    observer.observe(world);
+    return () => {
+      window.removeEventListener("resize", updateDims);
+      observer.disconnect();
+    };
   }, []);
 
   // 1. Central Particle Heart & Canvas Effects
@@ -119,14 +149,16 @@ export default function MemoryOrbit() {
     let animId: number;
 
     const render = (time: number) => {
+      if (!isVisibleRef.current) {
+        animId = requestAnimationFrame(render);
+        return;
+      }
+
       ctx.clearRect(0, 0, width, height);
       const centerX = width * 0.5;
       const centerY = height * 0.5;
 
-      const musicEnergy =
-        Number.parseFloat(
-          getComputedStyle(document.documentElement).getPropertyValue("--music-energy")
-        ) || 0;
+      const musicEnergy = 0.15;
 
       // Draw soft pink ripples expanding
       const ripples = ripplesRef.current;
@@ -229,14 +261,18 @@ export default function MemoryOrbit() {
     let animId: number;
 
     const tick = () => {
+      if (!isVisibleRef.current) {
+        animId = requestAnimationFrame(tick);
+        return;
+      }
+
       // Natural orbit rotation if not dragging and not zoomed into a photo
       if (!dragRef.current.isDragging && !activePhoto) {
         angleRef.current += velocityRef.current;
       }
 
-      const rect = world.getBoundingClientRect();
-      const w = rect.width;
-      const h = rect.height;
+      const w = dimsRef.current.w;
+      const h = dimsRef.current.h;
 
       const isMobile = w < 640;
       const isTablet = w >= 640 && w < 1100;

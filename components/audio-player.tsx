@@ -72,37 +72,44 @@ export const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
       }
     }, []);
 
-    // Frame loop to calculate real-time energy
+    // Frame loop to calculate real-time energy (smooth, non-blocking)
     useEffect(() => {
       let isRunning = true;
-      const updateEnergy = () => {
+      let lastUpdate = 0;
+
+      const updateEnergy = (time: number) => {
         if (!isRunning) return;
-        if (analyserRef.current && dataArrayRef.current && isPlaying) {
-          analyserRef.current.getByteFrequencyData(dataArrayRef.current);
-          let sum = 0;
-          const count = Math.min(8, dataArrayRef.current.length);
-          for (let i = 0; i < count; i++) {
-            sum += dataArrayRef.current[i];
+
+        // Throttle calculation to ~20fps to save main thread while keeping visual bars smooth
+        if (time - lastUpdate > 48) {
+          lastUpdate = time;
+          if (analyserRef.current && dataArrayRef.current && isPlaying) {
+            analyserRef.current.getByteFrequencyData(dataArrayRef.current);
+            let sum = 0;
+            const count = Math.min(8, dataArrayRef.current.length);
+            for (let i = 0; i < count; i++) {
+              sum += dataArrayRef.current[i];
+            }
+            const rawEnergy = sum / (count * 255);
+            energyRef.current = energyRef.current * 0.7 + rawEnergy * 0.3;
+          } else if (isPlaying) {
+            const t = time / 1000;
+            const beat = Math.pow(Math.sin(t * Math.PI * 1.1), 4);
+            energyRef.current = 0.15 + beat * 0.25;
+          } else {
+            energyRef.current = energyRef.current * 0.85;
           }
-          const rawEnergy = sum / (count * 255);
-          energyRef.current = energyRef.current * 0.7 + rawEnergy * 0.3;
-        } else if (isPlaying) {
-          const t = Date.now() / 1000;
-          const beat = Math.pow(Math.sin(t * Math.PI * 1.1), 4);
-          energyRef.current = 0.15 + beat * 0.25;
-        } else {
-          energyRef.current = energyRef.current * 0.85;
         }
 
-        document.documentElement.style.setProperty(
-          "--music-energy",
-          energyRef.current.toFixed(3)
-        );
-
-        rafRef.current = requestAnimationFrame(updateEnergy);
+        if (isPlaying) {
+          rafRef.current = requestAnimationFrame(updateEnergy);
+        }
       };
 
-      rafRef.current = requestAnimationFrame(updateEnergy);
+      if (isPlaying) {
+        rafRef.current = requestAnimationFrame(updateEnergy);
+      }
+
       return () => {
         isRunning = false;
         if (rafRef.current) cancelAnimationFrame(rafRef.current);

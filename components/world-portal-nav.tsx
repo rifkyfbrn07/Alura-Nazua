@@ -17,21 +17,30 @@ type WorldDestination = {
 
 const DESTINATIONS: WorldDestination[] = [
   {
+    id: "dest-photobooth",
+    targetId: "pink-photobooth",
+    name: "Pink Photobooth Studio",
+    tagline: "Real device camera, 12 cute frames, filters & high-res print export",
+    sticker: "📷",
+    color: "#FFF0F2",
+    border: "#A94F65",
+  },
+  {
     id: "dest-gachapon",
     targetId: "memory-gachapon",
     name: "Memory Gachapon",
     tagline: "Turn the crank for surprise polaroids & sweet notes",
     sticker: "🎀",
-    color: "#FFF0F2",
+    color: "#FCE8E8",
     border: "#D58C9C",
   },
   {
     id: "dest-studio",
     targetId: "couple-photo-studio",
     name: "Couple Photo Studio",
-    tagline: "Style photobooth prints & export as high-res PNG",
+    tagline: "Style keepsake prints & export as high-res PNG",
     sticker: "📸",
-    color: "#FCE8E8",
+    color: "#FFF7F5",
     border: "#E8B5C0",
   },
   {
@@ -49,7 +58,7 @@ const DESTINATIONS: WorldDestination[] = [
     name: "Daily Love Note",
     tagline: "A fresh thought blooming every morning on your device",
     sticker: "🌷",
-    color: "#FFF7F5",
+    color: "#FFF0F2",
     border: "#A94F65",
   },
 ];
@@ -86,12 +95,12 @@ export default function WorldPortalNav() {
           </h2>
 
           <p className="text-xs sm:text-sm text-[#702C43]/75 font-sans leading-relaxed">
-            Four interactive rooms made just for you. Tap any destination to travel there directly!
+            Five interactive rooms made just for you, from real camera photobooths to daily love letters. Tap any destination to travel there directly!
           </p>
         </div>
 
-        {/* 4 Destination Stamp Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
+        {/* 5 Destination Stamp Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5 max-w-6xl mx-auto">
           {DESTINATIONS.map((dest) => (
             <div
               key={dest.id}

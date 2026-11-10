@@ -14,9 +14,21 @@ export default function PersonalizedEnding() {
   // Soft falling petals canvas
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    let isVisible = false;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          isVisible = entry.isIntersecting;
+        });
+      },
+      { rootMargin: "100px" }
+    );
+    observer.observe(container);
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let width = (canvas.width = canvas.offsetWidth || window.innerWidth);
@@ -30,7 +42,7 @@ export default function PersonalizedEnding() {
     window.addEventListener("resize", handleResize);
 
     const petalColors = ["#FFF7F5", "#FCE8E8", "#F4D1D5", "#E8B5C0", "#D58C9C"];
-    const petals = Array.from({ length: 20 }, () => ({
+    const petals = Array.from({ length: 15 }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
       size: Math.random() * 8 + 6,
@@ -48,6 +60,11 @@ export default function PersonalizedEnding() {
     let animId: number;
 
     const render = () => {
+      if (!isVisible) {
+        animId = requestAnimationFrame(render);
+        return;
+      }
+
       ctx.clearRect(0, 0, width, height);
 
       for (let i = 0; i < petals.length; i++) {
@@ -98,6 +115,7 @@ export default function PersonalizedEnding() {
     animId = requestAnimationFrame(render);
 
     return () => {
+      observer.disconnect();
       window.removeEventListener("resize", handleResize);
       cancelAnimationFrame(animId);
     };

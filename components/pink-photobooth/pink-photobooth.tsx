@@ -32,6 +32,7 @@ import {
   playPopSound,
   playSparkleSound,
   playChimeWin,
+  playPaperSound,
 } from "@/lib/sound-effects";
 
 type LayoutType = "strip4" | "strip3" | "single" | "grid2x2";
@@ -311,7 +312,7 @@ export default function PinkPhotobooth() {
     const loadedImages: HTMLImageElement[] = await Promise.all(
       capturedPhotos.map(
         (src) =>
-          new Promise((resolve) => {
+          new Promise<HTMLImageElement>((resolve) => {
             const img = new Image();
             img.onload = () => resolve(img);
             img.src = src;
