@@ -11,7 +11,7 @@ import FirstGreeting from "@/components/first-greeting";
 import WorldHero from "@/components/world-hero";
 import MemoryOrbit from "@/components/memory-orbit";
 import LittleThings from "@/components/little-things";
-import LittleToybox from "@/components/little-toybox";
+import GacoanPhotobooth from "@/components/gacoan-photobooth";
 import MemoryGallery from "@/components/memory-gallery";
 import RelationshipTimeline from "@/components/relationship-timeline";
 import LittlePromise from "@/components/little-promise";
@@ -97,8 +97,8 @@ export default function LoveExperience() {
           {/* Section 6: The Little Things I Love About You (Alura's favorites) */}
           <LittleThings />
 
-          {/* Section: OUR LITTLE TOYBOX (Interactive Photobooth Keepsakes) */}
-          <LittleToybox />
+          {/* Section: OUR LITTLE GACOAN MEMORY (Photobooth Keepsakes) */}
+          <GacoanPhotobooth />
 
           {/* Section 7: Our Little Moments (Scrapbook Polaroids & Filmstrip) */}
           <MemoryGallery />

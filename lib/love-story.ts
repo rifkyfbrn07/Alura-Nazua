@@ -7,15 +7,17 @@ import mybiniPortrait from "@/image/mybini.jpeg";      // Alura in navy blue hij
 import masiImutPortrait from "@/image/masi imut.jpeg"; // Alura in soft blush pink hijab (4-frame selfie)
 import hiiPortrait from "@/image/hii.jpeg";            // Alura in black hijab with glasses, playful cute poses
 
-// Couple photographs of Rifky and Alura together (prioritizing authentic photobooth & recent moments)
+// Couple photographs of Rifky and Alura together (prioritizing authentic photobooth & Mie Gacoan moments)
 import coupleNightPhoto from "@/image/berdua.jpeg";                              // Close night selfie together
 import coupleSweetPhoto from "@/image/WhatsApp Image 2026-11-10 at 09.33.29.jpeg";       // Close sweet selfie together
 import coupleWarmPhoto from "@/image/WhatsApp Image 2026-11-10 at 09.33.29 (1).jpeg";   // Smiling warmly together
 import couplePlayfulPhoto from "@/image/WhatsApp Image 2026-11-10 at 09.33.29 (2).jpeg"; // Playful close selfie
-import coupleCafeTablet1 from "@/image/WhatsApp Image 2026-11-10 at 09.33.27 (1).jpeg";  // Tablet café selfie (playful faces)
-import coupleCafeTablet2 from "@/image/WhatsApp Image 2026-11-10 at 09.33.27 (2).jpeg";  // Tablet café selfie angle 2
-import coupleCafeTablet3 from "@/image/WhatsApp Image 2026-11-10 at 09.33.27.jpeg";      // Tablet café selfie
-import coupleCafeGaze from "@/image/WhatsApp Image 2026-11-10 at 09.33.28.jpeg";         // Rifky & Alura smiling at café table
+
+// Mie Gacoan Memories (Tablet selfies with GACOAN background)
+import coupleGacoanTablet1 from "@/image/WhatsApp Image 2026-11-10 at 09.33.27 (1).jpeg";  // Tablet selfie at Mie Gacoan
+import coupleGacoanTablet2 from "@/image/WhatsApp Image 2026-11-10 at 09.33.27 (2).jpeg";  // Tablet selfie angle 2 at Mie Gacoan
+import coupleGacoanTablet3 from "@/image/WhatsApp Image 2026-11-10 at 09.33.27.jpeg";      // Tablet selfie at Mie Gacoan
+import coupleGacoanGaze from "@/image/WhatsApp Image 2026-11-10 at 09.33.28.jpeg";         // Rifky & Alura smiling at Mie Gacoan table
 
 // Lab Box Photobooth strips (Rifky & Alura with matching bucket hats, gingham border, cute stickers)
 import labBoxStripFull from "@/image/WhatsApp Image 2026-11-10 at 09.33.24.jpeg";        // Lab Box print held in hand
@@ -83,11 +85,11 @@ export const orbitMemories: OrbitMemory[] = [
   },
   {
     id: "orbit-3",
-    image: coupleCafeTablet1,
-    caption: "little café laughter",
-    alt: "Rifky and Alura taking tablet selfies at the café",
-    note: "Every little silly face and spontaneous moment with you is a treasure.",
-    date: "Café date",
+    image: coupleGacoanTablet1,
+    caption: "a day at Gacoan",
+    alt: "Rifky and Alura taking tablet selfies at Mie Gacoan",
+    note: "Just an ordinary day having Mie Gacoan together that became one of my sweetest memories.",
+    date: "Mie Gacoan",
     tapeColor: "#D58C9C",
   },
   {
@@ -155,8 +157,8 @@ export const orbitMemories: OrbitMemory[] = [
   },
 ];
 
-// Section: OUR LITTLE TOYBOX — Interactive Photobooth Strips
-export type PhotoboothStrip = {
+// Special Scrapbook Chapter: OUR LITTLE GACOAN MEMORY (Photobooth Strips & Printed Memories)
+export type GacoanPhotoboothStrip = {
   id: string;
   title: string;
   caption: string;
@@ -165,48 +167,53 @@ export type PhotoboothStrip = {
   rotation: number;
   ribbonColor: string;
   note: string;
+  stamp: string;
 };
 
-export const toyboxPhotoboothStrips: PhotoboothStrip[] = [
+export const gacoanPhotoboothStrips: GacoanPhotoboothStrip[] = [
   {
     id: "strip-1",
     title: "Lab Box Photobooth",
-    caption: "my favorite little moments.",
+    caption: "Just a little day at Gacoan.",
     sticker: "🎀",
     image: labBoxStripFull,
-    rotation: -3,
+    rotation: -2.5,
     ribbonColor: "#F4D1D5",
-    note: "The photobooth strip with matching bucket hats, gingham border, and the biggest smiles.",
+    note: "Our printed photobooth strip with matching bucket hats, gingham border, and the biggest smiles.",
+    stamp: "GACOAN // MEMORY_01",
   },
   {
     id: "strip-2",
-    title: "Matching Hats & Hugs",
-    caption: "we look cute together, don't we?",
+    title: "Matching Bucket Hats",
+    caption: "One of my favorite little memories with you.",
     sticker: "⭐",
     image: labBoxStripScreen,
-    rotation: 2.5,
+    rotation: 2.2,
     ribbonColor: "#E8B5C0",
-    note: "Looking at the screen while holding our printed strip, laughing at every pose.",
+    note: "Holding our freshly printed Lab Box strip in front of the screen, laughing at every pose.",
+    stamp: "GACOAN // MEMORY_02",
   },
   {
     id: "strip-3",
-    title: "Café Table Memories",
-    caption: "one strip, so many memories.",
+    title: "Gacoan Table Selfies",
+    caption: "Even ordinary days become special with you.",
     sticker: "🌷",
-    image: coupleCafeTablet2,
-    rotation: -1.5,
+    image: coupleGacoanTablet2,
+    rotation: -1.8,
     ribbonColor: "#D58C9C",
-    note: "Sitting across from each other, capturing selfies through the screen on a sunny afternoon.",
+    note: "Taking selfies together at our table with the tablet screen, smiling through the afternoon.",
+    stamp: "GACOAN // MEMORY_03",
   },
   {
     id: "strip-4",
-    title: "Endless Smiles",
-    caption: "I'd keep these moments forever.",
+    title: "Smiling Across the Table",
+    caption: "One of my favorite little memories with you.",
     sticker: "💫",
-    image: coupleCafeGaze,
-    rotation: 3.5,
+    image: coupleGacoanGaze,
+    rotation: 3.0,
     ribbonColor: "#F4D1D5",
-    note: "The quiet look in your eyes that always tells me everything will be okay.",
+    note: "Sitting across from each other at Gacoan, sharing laughs and quiet moments.",
+    stamp: "GACOAN // MEMORY_04",
   },
 ];
 
@@ -256,9 +263,9 @@ export const favoriteThings: FavoriteThing[] = [
   {
     id: "cappuccino",
     name: "Cappuccino",
-    category: "Cozy Coffee",
+    category: "Warm Comfort",
     iconType: "coffee",
-    message: "The warm aroma and cozy conversations that always feel far too short.",
+    message: "The warm aroma and conversations that always feel far too short.",
     accentColor: "#D2B48C",
   },
   {
@@ -346,13 +353,13 @@ export const scrapbookMoments: ScrapbookMoment[] = [
   },
   {
     id: "moment-3",
-    image: coupleCafeTablet1,
-    title: "Café Afternoon",
-    caption: "Spontaneous silly faces in front of the screen that make me smile every time.",
-    date: "Café date",
+    image: coupleGacoanTablet1,
+    title: "Our Day at Gacoan",
+    caption: "Spontaneous silly faces and laughter together at Mie Gacoan.",
+    date: "Mie Gacoan memory",
     tapeRotation: -2,
     rotation: -2.5,
-    tag: "SMILES // MEMORY_03",
+    tag: "GACOAN // MEMORY_03",
   },
   {
     id: "moment-4",
