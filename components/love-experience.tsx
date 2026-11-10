@@ -33,6 +33,11 @@ import CuteButterflies from "@/components/cute-butterflies";
 import HiddenLiliesManager from "@/components/hidden-lilies-manager";
 import CollectionAlbum from "@/components/collection-album";
 import SurpriseVisitor from "@/components/surprise-visitor";
+import WorldPortalNav from "@/components/world-portal-nav";
+import MemoryGachapon from "@/components/memory-gachapon";
+import CouplePhotoStudio from "@/components/couple-photo-studio";
+import OpenWhenLetters from "@/components/open-when-letters";
+import DailyLoveNote from "@/components/daily-love-note";
 
 type ExperiencePhase = "preloader" | "greeting" | "world";
 
@@ -118,6 +123,9 @@ export default function LoveExperience() {
           {/* Memory Constellation Orbit (Crucial preserved feature) */}
           <MemoryOrbit />
 
+          {/* World Passport Navigation Hub to 4 Interactive Rooms */}
+          <WorldPortalNav />
+
           {/* Section 6: The Little Things I Love About You (Alura's favorites) */}
           <LittleThings />
 
@@ -126,6 +134,9 @@ export default function LoveExperience() {
 
           {/* Section: THE LITTLE CLAW MACHINE 🎀 */}
           <LittleClawMachine />
+
+          {/* Feature 1: OUR LITTLE MEMORY GACHAPON 🎀 */}
+          <MemoryGachapon />
 
           {/* Section A: Every Minute With You (Live time ticker & reflections) */}
           <MinuteWithYou />
@@ -136,6 +147,9 @@ export default function LoveExperience() {
           {/* Section 7: OUR LITTLE TOYBOX (Pastel Keepsake Box) */}
           <LittleToybox />
 
+          {/* Feature 2: COUPLE PHOTO STUDIO 📸 */}
+          <CouplePhotoStudio />
+
           {/* Section: THE MYSTERY GIFT BOXES 🎁 */}
           <MysteryGiftBoxes />
 
@@ -144,6 +158,9 @@ export default function LoveExperience() {
 
           {/* Section 9: Our Story Timeline (Dynamic relationship counter) */}
           <RelationshipTimeline />
+
+          {/* Feature 4: DAILY LOVE NOTE 🌷 (A Little Note for Today) */}
+          <DailyLoveNote />
 
           {/* Section: HOW WELL DO YOU KNOW US? 💗 */}
           <RelationshipQuiz />
@@ -156,6 +173,9 @@ export default function LoveExperience() {
 
           {/* Section D: You Are My Moon (Night sky with glowing moon) */}
           <YouAreMyMoon />
+
+          {/* Feature 3: OPEN WHEN... LETTERS 💌 */}
+          <OpenWhenLetters />
 
           {/* Section: A LITTLE WISHING WELL ✨ */}
           <LittleWishingWell />

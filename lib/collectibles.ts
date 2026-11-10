@@ -73,6 +73,34 @@ export const ALL_BADGES: CollectibleBadge[] = [
     sticker: "🌸",
     color: "#D58C9C",
   },
+  {
+    id: "gachapon",
+    name: "Gachapon Collector",
+    description: "Turned the crank and collected memories from the gachapon.",
+    sticker: "🎀",
+    color: "#FCE8E8",
+  },
+  {
+    id: "photoStudio",
+    name: "Photobooth Stylist",
+    description: "Designed and styled custom keepsake photobooth prints.",
+    sticker: "📸",
+    color: "#FFF0F2",
+  },
+  {
+    id: "openWhenLetters",
+    name: "Heart Reader",
+    description: "Unfolded comforting words for different kinds of days.",
+    sticker: "💌",
+    color: "#F4D1D5",
+  },
+  {
+    id: "dailyNote",
+    name: "Daily Devotion",
+    description: "Opened today's special handwritten love note.",
+    sticker: "🌷",
+    color: "#E8B5C0",
+  },
 ];
 
 const STORAGE_KEY = "alura_little_collectibles";
