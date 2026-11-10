@@ -1,9 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardRef } from "react";
-import { Play, Pause, Volume2, VolumeX } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, SkipForward, Music } from "lucide-react";
 import PinkLily from "@/components/pink-lily";
 import { isSfxEnabled, toggleSfx } from "@/lib/sound-effects";
+
+const TRACKS = [
+  { id: "shape-of-my-heart", title: "Shape of My Heart", src: "/audio/Shape-of-My-Heart.mp3" },
+  { id: "dinda", title: "Dinda", src: "/audio/dinda.mp3" },
+];
 
 export type AudioPlayerHandle = {
   play: () => Promise<void>;
@@ -29,6 +34,14 @@ export const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
     const [isPlaying, setIsPlaying] = useState(false);
     const [autoplayBlocked, setAutoplayBlocked] = useState(false);
     const [sfxActive, setSfxActive] = useState(true);
+    const [trackIndex, setTrackIndex] = useState(0);
+
+    const currentTrack = TRACKS[trackIndex];
+
+    const handleNextTrack = useCallback((e: React.MouseEvent) => {
+      e.stopPropagation();
+      setTrackIndex((prev) => (prev + 1) % TRACKS.length);
+    }, []);
 
     const handleToggleSfx = useCallback((e: React.MouseEvent) => {
       e.stopPropagation();
@@ -172,11 +185,21 @@ export const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
       };
     }, [autoPlayAttempt, playAudio]);
 
+    // Handle track changes
+    useEffect(() => {
+      const audio = audioRef.current;
+      if (!audio) return;
+      audio.src = TRACKS[trackIndex].src;
+      if (isPlaying) {
+        audio.play().catch((err) => console.warn("Track change play notice:", err));
+      }
+    }, [trackIndex, isPlaying]);
+
     return (
       <>
         <audio
           ref={audioRef}
-          src="/audio/Shape-of-My-Heart.mp3"
+          src={TRACKS[0].src}
           loop
           preload="auto"
           playsInline
@@ -204,6 +227,18 @@ export const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
             <span className="hidden sm:inline text-[10px]">SFX</span>
           </button>
 
+          {/* Music Track Switcher */}
+          <button
+            type="button"
+            onClick={handleNextTrack}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border border-[#E8B5C0] bg-white/80 backdrop-blur-md text-[#702C43] text-[11px] font-mono shadow-sm hover:bg-white hover:border-[#D58C9C] active:scale-95 transition-all"
+            title={`Switch track (Current: ${currentTrack.title})`}
+            aria-label="Switch song"
+          >
+            <SkipForward size={13} className="text-[#A94F65]" />
+            <span className="hidden md:inline text-[10px]">Next song</span>
+          </button>
+
           <button
             type="button"
             onClick={togglePlay}
@@ -214,7 +249,7 @@ export const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
                 ? "bg-[#FCE8E8] border-[#A94F65] text-[#702C43] animate-pulse hover:bg-[#F4D1D5]"
                 : "bg-white/80 border-[#E8B5C0] text-[#702C43]/80 hover:border-[#D58C9C]"
             }`}
-            title={isPlaying ? "Pause soundtrack" : "Play Shape of My Heart"}
+            title={isPlaying ? `Pause soundtrack (${currentTrack.title})` : `Play soundtrack (${currentTrack.title})`}
             aria-label={isPlaying ? "Pause soundtrack" : "Play soundtrack"}
           >
             {/* Visualizer bars */}
@@ -237,7 +272,7 @@ export const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
             </span>
 
             <span className="text-[11px] font-mono tracking-widest uppercase">
-              {isPlaying ? "Shape of My Heart // Playing" : autoplayBlocked ? "Tap for Music" : "Shape of My Heart // Paused"}
+              {isPlaying ? `${currentTrack.title} // Playing` : autoplayBlocked ? "Tap for Music" : `${currentTrack.title} // Paused`}
             </span>
 
             {isPlaying ? (

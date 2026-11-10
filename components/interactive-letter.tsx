@@ -5,7 +5,7 @@ import Image from "next/image";
 import gsap from "gsap";
 import { X, Sparkles, Heart } from "lucide-react";
 import PinkLily from "@/components/pink-lily";
-import { foundationLetter, recipientName, letterEnvelopePhoto } from "@/lib/love-story";
+import { foundationLetter, recipientName, letterEnvelopePhoto, letterAdditionalChapters } from "@/lib/love-story";
 import { playPaperSound, playSparkleSound } from "@/lib/sound-effects";
 
 export default function InteractiveLetter() {
@@ -263,6 +263,40 @@ export default function InteractiveLetter() {
                   Forever kept in my heart
                 </p>
               </div>
+            </div>
+
+            {/* EXPANDED JOURNAL CHAPTERS — Continued Stories & Memories */}
+            <div className="mt-12 pt-10 border-t-2 border-dashed border-[#F4D1D5] space-y-12">
+              <div className="text-center">
+                <span className="text-[10px] font-mono tracking-[0.25em] text-[#A94F65] uppercase">
+                  PAGES OF OUR JOURNAL // CONTINUED
+                </span>
+                <p className="font-serif italic text-sm text-[#702C43]/70 mt-1">
+                  Catatan-catatan kecil tentang kita, hari-hari baik, dan apa yang kurasakan
+                </p>
+              </div>
+
+              {letterAdditionalChapters.map((ch) => (
+                <div
+                  key={ch.number}
+                  className="relative p-6 sm:p-7 rounded-2xl bg-[#FFF7F5]/80 border border-[#F4D1D5] shadow-xs"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-xs font-mono font-semibold text-[#A94F65]">
+                      [{ch.number}]
+                    </span>
+                    <h3 className="font-serif text-lg sm:text-xl font-medium text-[#702C43]">
+                      {ch.title}
+                    </h3>
+                  </div>
+
+                  <div className="space-y-3 font-serif text-sm sm:text-base leading-relaxed text-[#702C43]/85">
+                    {ch.paragraphs.map((p, pIdx) => (
+                      <p key={pIdx}>{p}</p>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* Footer */}

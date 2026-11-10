@@ -179,7 +179,7 @@ export const gacoanPhotoboothStrips: GacoanPhotoboothStrip[] = [
     image: labBoxStripFull,
     rotation: -2.5,
     ribbonColor: "#F4D1D5",
-    note: "Our printed photobooth strip with matching bucket hats, gingham border, and the biggest smiles.",
+    note: "Proof that we can make a whole memory out of a random day. Matching bucket hats, gingham border, and the biggest smiles.",
     stamp: "GACOAN // MEMORY_01",
   },
   {
@@ -190,7 +190,7 @@ export const gacoanPhotoboothStrips: GacoanPhotoboothStrip[] = [
     image: labBoxStripScreen,
     rotation: 2.2,
     ribbonColor: "#E8B5C0",
-    note: "Holding our freshly printed Lab Box strip in front of the screen, laughing at every pose.",
+    note: "I could look at these pictures a hundred times and still smile. Holding our freshly printed Lab Box strip in front of the screen.",
     stamp: "GACOAN // MEMORY_02",
   },
   {
@@ -214,6 +214,42 @@ export const gacoanPhotoboothStrips: GacoanPhotoboothStrip[] = [
     ribbonColor: "#F4D1D5",
     note: "Sitting across from each other at Gacoan, sharing laughs and quiet moments.",
     stamp: "GACOAN // MEMORY_04",
+  },
+];
+
+// Playful Toybox Keepsakes (Section 7)
+export const toyboxKeepsakes = [
+  {
+    id: "tb-1",
+    title: "Lab Box Strip",
+    sticker: "🎀",
+    image: labBoxStripFull,
+    caption: "my favorite little moments.",
+    note: "A treasure kept inside our little toybox.",
+  },
+  {
+    id: "tb-2",
+    title: "Sweet Selfie",
+    sticker: "⭐",
+    image: coupleSweetPhoto,
+    caption: "we look cute together, don't we?",
+    note: "One of the sweetest frames we have.",
+  },
+  {
+    id: "tb-3",
+    title: "Gacoan Afternoon",
+    sticker: "🌷",
+    image: coupleGacoanTablet1,
+    caption: "one strip, so many memories.",
+    note: "Smiles that brighten every ordinary hour.",
+  },
+  {
+    id: "tb-4",
+    title: "Cherished Glance",
+    sticker: "💫",
+    image: coupleWarmPhoto,
+    caption: "I'd keep these moments forever.",
+    note: "Tucked away safely in our memory box.",
   },
 ];
 
@@ -421,18 +457,95 @@ export const foundationLetter = [
   "Rifky",
 ];
 
+// Section 10: Expanded 7 Chapters added inside the Letter Section
+export const letterAdditionalChapters = [
+  {
+    number: "01",
+    title: "My Favorite Little Things About You",
+    paragraphs: [
+      "Sometimes I think you don't even realize how cute you are when you're excited about something.",
+      "I hope you never stop being excited about the little things you love — pink lilies, sweet treats, butterflies, and all your spontaneous cravings.",
+      "I could listen to your random stories for much longer than you think.",
+    ],
+  },
+  {
+    number: "02",
+    title: "Every Minute With You",
+    paragraphs: [
+      "Aku baru sadar, ternyata waktu bisa terasa berbeda hanya karena siapa yang ada di dalamnya.",
+      "Satu menit bersamamu rasanya tidak pernah sama seperti satu menit biasanya. Menit-menit yang biasanya cuma lewat begitu saja, ketika bersamamu justru terasa ingin kusimpan lebih lama.",
+      "Bahkan hal sesederhana duduk berdua, ngobrol tentang sesuatu yang nggak penting, atau sekadar melihatmu tersenyum, bisa menjadi bagian dari hari yang ingin kuulang berkali-kali.",
+      "Aku nggak tahu bagaimana menjelaskannya dengan tepat. Yang jelas, bersamamu, waktu bukan cuma sesuatu yang berlalu. Ada sesuatu yang ingin aku kenang di setiap detiknya.",
+    ],
+  },
+  {
+    number: "03",
+    title: "Thank You for the Good Days",
+    paragraphs: [
+      "Terima kasih sudah menjadi bagian dari hari-hariku yang baik.",
+      "Terima kasih untuk tawa yang kadang muncul dari hal-hal paling sederhana, untuk cerita-cerita kecil yang mungkin kamu anggap biasa, untuk waktu yang kamu luangkan, dan untuk setiap momen yang tanpa sadar membuat hariku terasa lebih menyenangkan.",
+      "Mungkin bagimu, beberapa di antaranya hanyalah hari biasa. Tapi bagiku, ada banyak hari yang menjadi lebih baik hanya karena aku melewatinya bersamamu.",
+      "Aku harap kamu tahu bahwa kehadiranmu nggak pernah menjadi hal kecil buatku. Aku menghargai setiap waktu yang kita punya, setiap kesempatan untuk bertemu, dan setiap kenangan yang perlahan kita kumpulkan.",
+      "Terima kasih, ya, sudah menghadirkan begitu banyak hari baik dalam hidupku.",
+    ],
+  },
+  {
+    number: "04",
+    title: "You Are My Moon",
+    paragraphs: [
+      "Dan terima kasih karena sudah menjadi bulan di kala malamku.",
+      "Bukan karena kamu harus selalu menerangi semuanya, bukan juga karena aku berharap kamu harus selalu terlihat terang.",
+      "Tapi karena, seperti bulan yang tetap indah meski langit sedang gelap, kehadiranmu sering kali membuat malam-malamku terasa sedikit lebih tenang.",
+      "Ada sesuatu tentang kamu yang membuat dunia terasa tidak terlalu bising. Sesuatu yang membuatku ingin berhenti sebentar, menarik napas, dan menikmati kenyataan bahwa aku punya seseorang sepertimu untuk disayangi.",
+      "Kalau malam punya bulan untuk ditemani, aku bersyukur karena dalam hidupku ada kamu.",
+      "Dan kalau suatu saat malam terasa panjang, aku harap kita masih bisa saling menemukan, saling mendengarkan, dan mengingat bahwa kita nggak harus selalu sempurna untuk bisa saling menyayangi.",
+    ],
+  },
+  {
+    number: "05",
+    title: "More Little Moments",
+    paragraphs: [
+      "Dari hari biasa makan Mie Gacoan berdua, foto photobooth pakai topi lucu, sampai ngobrol santai sambil ketawa... semuanya jadi potongan memori yang sangat berharga.",
+      "Proof that we can make a whole memory out of a random day.",
+      "I could look at these pictures a hundred times and still smile.",
+    ],
+  },
+  {
+    number: "06",
+    title: "Things I Want to Do With You",
+    paragraphs: [
+      "Aku ingin lebih banyak menit yang terasa terlalu singkat karena kita terlalu asyik bercerita.",
+      "Lebih banyak foto yang nanti kita lihat sambil tertawa.",
+      "Lebih banyak perjalanan kecil tanpa rencana.",
+      "Lebih banyak hari biasa yang diam-diam menjadi kenangan luar biasa.",
+    ],
+  },
+  {
+    number: "07",
+    title: "Our Next Chapter",
+    paragraphs: [
+      "Aku nggak meminta semua hari kita nanti selalu indah. Aku tahu akan ada hari yang melelahkan, percakapan yang mungkin sulit, dan hal-hal yang perlu kita pelajari bersama.",
+      "Tapi aku ingin tetap punya kesempatan untuk menjalani hari-hari itu denganmu.",
+      "Kalau masih ada banyak halaman yang belum kita tulis, aku ingin mengisinya perlahan bersamamu.",
+      "Dan dari sekian banyak hal yang bisa kupilih, aku masih ingin memilih kamu.",
+    ],
+  },
+];
+
 // Envelope Polaroid Photo (tucked inside letter)
 export const letterEnvelopePhoto = coupleSweetPhoto;
 
-// Section 11: Final Scene
+// Section 11: Final Scene (Updated with exact sincere Indonesian writing)
 export const finalScene = {
-  lines: [
-    "There's still so much life to experience.",
-    "More little moments to collect.",
-    "More reasons to smile.",
-    "And so many pages left to write.",
+  paragraphs: [
+    "Aku nggak butuh setiap hari kita menjadi sempurna.",
+    "Aku cuma ingin kita terus belajar. Mendengarkan sedikit lebih baik. Memahami satu sama lain sedikit lebih dalam. Tertawa karena hal-hal kecil. Dan tetap menikmati waktu yang kita punya.",
+    "Aku ingin lebih banyak cerita, lebih banyak foto, lebih banyak perjalanan kecil, dan lebih banyak hari biasa yang terasa istimewa karena ada kamu di dalamnya.",
+    "Terima kasih sudah menjadi bagian dari hari-hariku.",
+    "Kalau masih ada banyak halaman yang belum kita tulis, aku ingin mengisinya bersamamu.",
   ],
+  highlight: "And if I could meet you all over again, I think my heart would still choose you.",
   dedication: "For you, Alura.",
-  signature: "With love, Rifky.",
+  signature: "— Rifky",
   photo: coupleWarmPhoto,
 };

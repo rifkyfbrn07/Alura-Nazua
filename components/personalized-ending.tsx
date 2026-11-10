@@ -143,7 +143,7 @@ export default function PersonalizedEnding() {
         }
       );
 
-      finalScene.lines.forEach((_, index) => {
+      finalScene.paragraphs.forEach((_, index) => {
         gsap.fromTo(
           `.ending-line-${index}`,
           { opacity: 0, y: 15 },
@@ -158,6 +158,22 @@ export default function PersonalizedEnding() {
           }
         );
       });
+
+      gsap.fromTo(
+        ".ending-highlight",
+        { opacity: 0, y: 20, scale: 0.98 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: reducedMotion ? 0.2 : 1.1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".ending-highlight",
+            start: "top 85%",
+          },
+        }
+      );
     }, container);
 
     return () => ctx.revert();
@@ -198,25 +214,32 @@ export default function PersonalizedEnding() {
           </div>
         </div>
 
-        {/* Sequential Hopeful & Warm Lines */}
-        <div className="space-y-4 max-w-md mx-auto mb-10">
-          {finalScene.lines.map((line, index) => (
+        {/* Sincere Ending Paragraphs */}
+        <div className="space-y-4 max-w-lg mx-auto mb-8 text-center">
+          {finalScene.paragraphs.map((para, index) => (
             <p
               key={index}
-              className={`ending-line-${index} font-serif text-lg sm:text-2xl text-[#702C43] font-light leading-relaxed`}
+              className={`ending-line-${index} font-serif text-base sm:text-lg text-[#702C43]/90 font-light leading-relaxed`}
             >
-              &ldquo;{line}&rdquo;
+              {para}
             </p>
           ))}
+        </div>
+
+        {/* Highlight Quote */}
+        <div className="ending-highlight max-w-md mx-auto mb-10 p-5 rounded-2xl bg-white/70 border border-[#F4D1D5] shadow-xs">
+          <p className="font-serif italic font-medium text-lg sm:text-xl text-[#702C43] leading-relaxed">
+            &ldquo;{finalScene.highlight}&rdquo;
+          </p>
+          <span className="block text-xs font-mono text-[#A94F65] tracking-widest mt-2 uppercase">
+            {finalScene.signature}
+          </span>
         </div>
 
         {/* Warm Dedication */}
         <div className="pt-6 border-t border-[#F4D1D5] flex flex-col items-center gap-1.5 w-52">
           <span className="font-serif text-2xl text-[#702C43] font-medium tracking-wide">
             {finalScene.dedication}
-          </span>
-          <span className="text-xs font-mono tracking-widest text-[#A94F65] uppercase">
-            {finalScene.signature}
           </span>
         </div>
 

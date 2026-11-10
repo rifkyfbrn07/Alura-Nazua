@@ -11,9 +11,12 @@ import FirstGreeting from "@/components/first-greeting";
 import WorldHero from "@/components/world-hero";
 import MemoryOrbit from "@/components/memory-orbit";
 import LittleThings from "@/components/little-things";
+import MinuteWithYou from "@/components/minute-with-you";
 import GacoanPhotobooth from "@/components/gacoan-photobooth";
+import LittleToybox from "@/components/little-toybox";
 import MemoryGallery from "@/components/memory-gallery";
 import RelationshipTimeline from "@/components/relationship-timeline";
+import YouAreMyMoon from "@/components/you-are-my-moon";
 import LittlePromise from "@/components/little-promise";
 import InteractiveLetter from "@/components/interactive-letter";
 import PersonalizedEnding from "@/components/personalized-ending";
@@ -97,22 +100,31 @@ export default function LoveExperience() {
           {/* Section 6: The Little Things I Love About You (Alura's favorites) */}
           <LittleThings />
 
+          {/* Section A: Every Minute With You (Live time ticker & reflections) */}
+          <MinuteWithYou />
+
           {/* Section: OUR LITTLE GACOAN MEMORY (Photobooth Keepsakes) */}
           <GacoanPhotobooth />
 
-          {/* Section 7: Our Little Moments (Scrapbook Polaroids & Filmstrip) */}
+          {/* Section 7: OUR LITTLE TOYBOX (Pastel Keepsake Box) */}
+          <LittleToybox />
+
+          {/* Section 8: Our Little Moments (Scrapbook Polaroids & Filmstrip) */}
           <MemoryGallery />
 
-          {/* Section 8: Our Story Timeline (Dynamic relationship counter) */}
+          {/* Section 9: Our Story Timeline (Dynamic relationship counter) */}
           <RelationshipTimeline />
 
-          {/* Section 9: A Little Promise */}
+          {/* Section D: You Are My Moon (Night sky with glowing moon) */}
+          <YouAreMyMoon />
+
+          {/* Section: A Little Promise */}
           <LittlePromise />
 
-          {/* Section 10: Personal Letter in Wax-Sealed Ribbon Envelope */}
+          {/* Section 10: Personal Letter in Wax-Sealed Ribbon Envelope with 7 Chapters */}
           <InteractiveLetter />
 
-          {/* Section 11: Final Hopeful Scene */}
+          {/* Section 11 / E: Final Hopeful Scene — Our Next Chapter */}
           <PersonalizedEnding />
         </div>
       )}
