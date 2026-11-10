@@ -4,6 +4,7 @@ import { useState, useCallback, useRef } from "react";
 import Image from "next/image";
 import { Sparkles, Camera, Heart, RotateCcw, X, Stamp } from "lucide-react";
 import PinkLily from "@/components/pink-lily";
+import { HiddenLilyTrigger } from "@/components/hidden-lilies-manager";
 import { gacoanPhotoboothStrips, type GacoanPhotoboothStrip } from "@/lib/love-story";
 import { playCameraShutter, playPaperSound, playPopSound } from "@/lib/sound-effects";
 
@@ -94,6 +95,7 @@ export default function GacoanPhotobooth() {
             <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 border border-[#D58C9C] text-[#A94F65] text-[11px] font-mono shadow-xs">
               <Stamp size={12} />
               <span>Lab Box Series</span>
+              <HiddenLilyTrigger id="lily-gacoan" />
             </div>
           </div>
 

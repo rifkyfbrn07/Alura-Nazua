@@ -11,16 +11,28 @@ import FirstGreeting from "@/components/first-greeting";
 import WorldHero from "@/components/world-hero";
 import MemoryOrbit from "@/components/memory-orbit";
 import LittleThings from "@/components/little-things";
+import AluraGarden from "@/components/alura-garden";
+import LittleClawMachine from "@/components/claw-machine";
 import MinuteWithYou from "@/components/minute-with-you";
 import GacoanPhotobooth from "@/components/gacoan-photobooth";
 import LittleToybox from "@/components/little-toybox";
+import MysteryGiftBoxes from "@/components/mystery-gift-boxes";
 import MemoryGallery from "@/components/memory-gallery";
 import RelationshipTimeline from "@/components/relationship-timeline";
+import RelationshipQuiz from "@/components/relationship-quiz";
+import SecretMessageWall from "@/components/secret-message-wall";
+import ScrapbookBuilder from "@/components/scrapbook-builder";
 import YouAreMyMoon from "@/components/you-are-my-moon";
+import LittleWishingWell from "@/components/wishing-well";
+import MusicCorner from "@/components/music-corner";
 import LittlePromise from "@/components/little-promise";
 import InteractiveLetter from "@/components/interactive-letter";
+import OneLastSecret from "@/components/one-last-secret";
 import PersonalizedEnding from "@/components/personalized-ending";
 import CuteButterflies from "@/components/cute-butterflies";
+import HiddenLiliesManager from "@/components/hidden-lilies-manager";
+import CollectionAlbum from "@/components/collection-album";
+import SurpriseVisitor from "@/components/surprise-visitor";
 
 type ExperiencePhase = "preloader" | "greeting" | "world";
 
@@ -91,6 +103,15 @@ export default function LoveExperience() {
           {/* Subtle Fluttering Butterflies across the page */}
           <CuteButterflies />
 
+          {/* Hidden Lilies Manager & Tracker */}
+          <HiddenLiliesManager />
+
+          {/* Floating Collection Album & Badge Unlocked Toasts */}
+          <CollectionAlbum />
+
+          {/* Surprise Butterfly Visitor */}
+          <SurpriseVisitor />
+
           {/* Scrapbook Cover & Hero */}
           <WorldHero />
 
@@ -99,6 +120,12 @@ export default function LoveExperience() {
 
           {/* Section 6: The Little Things I Love About You (Alura's favorites) */}
           <LittleThings />
+
+          {/* Section: ALURA'S LITTLE GARDEN 🌷 & CATCH THE BUTTERFLIES 🦋 */}
+          <AluraGarden />
+
+          {/* Section: THE LITTLE CLAW MACHINE 🎀 */}
+          <LittleClawMachine />
 
           {/* Section A: Every Minute With You (Live time ticker & reflections) */}
           <MinuteWithYou />
@@ -109,20 +136,41 @@ export default function LoveExperience() {
           {/* Section 7: OUR LITTLE TOYBOX (Pastel Keepsake Box) */}
           <LittleToybox />
 
+          {/* Section: THE MYSTERY GIFT BOXES 🎁 */}
+          <MysteryGiftBoxes />
+
           {/* Section 8: Our Little Moments (Scrapbook Polaroids & Filmstrip) */}
           <MemoryGallery />
 
           {/* Section 9: Our Story Timeline (Dynamic relationship counter) */}
           <RelationshipTimeline />
 
+          {/* Section: HOW WELL DO YOU KNOW US? 💗 */}
+          <RelationshipQuiz />
+
+          {/* Section: THE SECRET MESSAGE WALL 💌 */}
+          <SecretMessageWall />
+
+          {/* Section: BUILD OUR LITTLE MEMORY SCRAPBOOK 📸 */}
+          <ScrapbookBuilder />
+
           {/* Section D: You Are My Moon (Night sky with glowing moon) */}
           <YouAreMyMoon />
+
+          {/* Section: A LITTLE WISHING WELL ✨ */}
+          <LittleWishingWell />
+
+          {/* Section: THE LITTLE MUSIC CORNER 🎧 */}
+          <MusicCorner />
 
           {/* Section: A Little Promise */}
           <LittlePromise />
 
           {/* Section 10: Personal Letter in Wax-Sealed Ribbon Envelope with 7 Chapters */}
           <InteractiveLetter />
+
+          {/* Section: ONE LAST LITTLE SURPRISE... 💌 */}
+          <OneLastSecret />
 
           {/* Section 11 / E: Final Hopeful Scene — Our Next Chapter */}
           <PersonalizedEnding />

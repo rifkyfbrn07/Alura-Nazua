@@ -231,3 +231,85 @@ export function playPopSound() {
   } catch {}
 }
 
+// 6. Water Drop & Ripple (For watering can and wishing well)
+export function playWaterDrop() {
+  if (!sfxEnabled) return;
+  const ctx = getContext();
+  if (!ctx) return;
+
+  try {
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(1100, t);
+    osc.frequency.exponentialRampToValueAtTime(580, t + 0.09);
+
+    gain.gain.setValueAtTime(0.12, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.12);
+  } catch {}
+}
+
+// 7. Confetti Pop (For mystery gift box & rewards)
+export function playConfettiPop() {
+  if (!sfxEnabled) return;
+  const ctx = getContext();
+  if (!ctx) return;
+
+  try {
+    const t = ctx.currentTime;
+
+    // Pop tone
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(320, t);
+    osc.frequency.exponentialRampToValueAtTime(880, t + 0.08);
+    gain.gain.setValueAtTime(0.1, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.1);
+
+    // Light sparkle
+    playSparkleSound();
+  } catch {}
+}
+
+// 8. Sweet Win Chime (For claw machine, quiz win, butterfly catch)
+export function playChimeWin() {
+  if (!sfxEnabled) return;
+  const ctx = getContext();
+  if (!ctx) return;
+
+  try {
+    const t = ctx.currentTime;
+    const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+    notes.forEach((freq, idx) => {
+      const delay = idx * 0.08;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(freq, t + delay);
+
+      gain.gain.setValueAtTime(0.06, t + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.45);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(t + delay);
+      osc.stop(t + delay + 0.45);
+    });
+  } catch {}
+}
+
+

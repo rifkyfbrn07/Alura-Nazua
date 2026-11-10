@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Moon, Sparkles, Star } from "lucide-react";
 import PinkLily from "@/components/pink-lily";
+import { HiddenLilyTrigger } from "@/components/hidden-lilies-manager";
 import coupleNightPhoto from "@/image/berdua.jpeg";
 
 export default function YouAreMyMoon() {
@@ -93,7 +94,10 @@ export default function YouAreMyMoon() {
 
         {/* Bottom Bar */}
         <div className="mt-10 pt-6 border-t border-[#A94F65]/40 flex items-center justify-between text-[11px] font-mono tracking-widest text-[#FCE8E8]/70 uppercase">
-          <span>ALURA // ALWAYS MY MOON</span>
+          <span className="flex items-center gap-2">
+            <span>ALURA // ALWAYS MY MOON</span>
+            <HiddenLilyTrigger id="lily-moon" />
+          </span>
           <span>WITH LOVE, RIFKY</span>
         </div>
       </div>

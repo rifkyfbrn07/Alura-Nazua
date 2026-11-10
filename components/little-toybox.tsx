@@ -4,6 +4,7 @@ import { useState, useCallback, useRef } from "react";
 import Image from "next/image";
 import { Sparkles, Camera, Heart, RotateCcw, X, Star } from "lucide-react";
 import PinkLily from "@/components/pink-lily";
+import { HiddenLilyTrigger } from "@/components/hidden-lilies-manager";
 import { toyboxKeepsakes } from "@/lib/love-story";
 import { playCameraShutter, playPaperSound, playPopSound } from "@/lib/sound-effects";
 
@@ -108,6 +109,7 @@ export default function LittleToybox() {
             <div className="flex items-center gap-2 text-xs font-mono text-[#A94F65]">
               <Camera size={14} />
               <span>Treasured Keepsakes</span>
+              <HiddenLilyTrigger id="lily-toybox" />
             </div>
           </div>
 

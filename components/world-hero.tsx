@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Sparkles, ArrowDown } from "lucide-react";
 import PinkLily from "@/components/pink-lily";
+import { HiddenLilyTrigger } from "@/components/hidden-lilies-manager";
 import { recipientFullName, recipientName, creatorName } from "@/lib/love-story";
 import mybiniPhoto from "@/image/mybini.jpeg";
 
@@ -74,6 +75,10 @@ export default function WorldHero() {
         {/* Small delicate floating polaroid preview */}
         <div className="relative w-32 sm:w-36 -rotate-2 hover:rotate-0 transition-transform duration-300">
           <div className="washi-tape top-[-8px] left-1/2 -translate-x-1/2 w-20" />
+          {/* Easter egg hidden lily #1 */}
+          <div className="absolute -top-3 -right-3 z-30">
+            <HiddenLilyTrigger id="lily-hero" />
+          </div>
           <div className="polaroid-frame w-full rounded">
             <div className="relative w-full aspect-square rounded-sm overflow-hidden bg-[#FCE8E8]">
               <Image

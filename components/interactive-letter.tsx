@@ -5,6 +5,7 @@ import Image from "next/image";
 import gsap from "gsap";
 import { X, Sparkles, Heart } from "lucide-react";
 import PinkLily from "@/components/pink-lily";
+import { HiddenLilyTrigger } from "@/components/hidden-lilies-manager";
 import { foundationLetter, recipientName, letterEnvelopePhoto, letterAdditionalChapters } from "@/lib/love-story";
 import { playPaperSound, playSparkleSound } from "@/lib/sound-effects";
 
@@ -181,6 +182,10 @@ export default function InteractiveLetter() {
         {/* Lily illustration stamped in top-left */}
         <div className="absolute top-3 left-3 pointer-events-none z-10 opacity-70">
           <PinkLily size={42} />
+        </div>
+        {/* Hidden lily Easter Egg #4 */}
+        <div className="absolute top-3 right-3 z-30">
+          <HiddenLilyTrigger id="lily-letter" />
         </div>
       </div>
 
