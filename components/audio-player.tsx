@@ -176,7 +176,7 @@ export const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
       <>
         <audio
           ref={audioRef}
-          src="/audio/dinda.mp3"
+          src="/audio/Shape-of-My-Heart.mp3"
           loop
           preload="auto"
           playsInline
@@ -214,7 +214,7 @@ export const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
                 ? "bg-[#FCE8E8] border-[#A94F65] text-[#702C43] animate-pulse hover:bg-[#F4D1D5]"
                 : "bg-white/80 border-[#E8B5C0] text-[#702C43]/80 hover:border-[#D58C9C]"
             }`}
-            title={isPlaying ? "Pause soundtrack" : "Play Dinda"}
+            title={isPlaying ? "Pause soundtrack" : "Play Shape of My Heart"}
             aria-label={isPlaying ? "Pause soundtrack" : "Play soundtrack"}
           >
             {/* Visualizer bars */}
@@ -237,7 +237,7 @@ export const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
             </span>
 
             <span className="text-[11px] font-mono tracking-widest uppercase">
-              {isPlaying ? "Dinda // Playing" : autoplayBlocked ? "Tap for Music" : "Dinda // Paused"}
+              {isPlaying ? "Shape of My Heart // Playing" : autoplayBlocked ? "Tap for Music" : "Shape of My Heart // Paused"}
             </span>
 
             {isPlaying ? (
