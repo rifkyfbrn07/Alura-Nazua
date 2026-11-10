@@ -15,167 +15,332 @@ import cutePortrait from "@/image/masi imut.jpeg";
 import greetingPortrait from "@/image/hii.jpeg";
 import recentMemory from "@/image/WhatsApp Image 2026-10-12 at 09.27.07.jpeg";
 import candidLook from "@/image/lurah.jpeg";
+import webcam1 from "@/image/webcam-toy-photo1.jpg";
+import webcam2 from "@/image/webcam-toy-photo2.jpg";
+import webcam3 from "@/image/webcam-toy-photo3.jpg";
+import webcam4 from "@/image/webcam-toy-photo4.jpg";
 
 export const recipientName = "Alura";
 export const recipientFullName = "Ghiscca Alura Nazua";
 export const creatorName = "Rifky";
 
-export const preloaderMessages = [
-  "Preparing something special...",
-  "Just for you, Alura.",
-  "Made with all my heart.",
+export const relationshipStartDate = new Date(2026, 8, 6); // 06 September 2026
+
+export const preloaderSteps = [
+  "Something special is blooming...",
+  "Alura",
+  "A little world made just for you.",
 ];
 
-export const firstGreeting = {
+export const welcomeScreen = {
   greeting: "Hey, Alura.",
   lead: "I made a little world for you.",
-  sublead: "Because some people remain special, no matter how much time passes.",
-  buttonLabel: "Enter my little world",
+  description:
+    "A place filled with the little things I love about you, our memories, and everything I still want to keep building with you.",
+  buttonText: "Enter my little world",
+  featuredPhoto: ghisccaPortrait,
+  photoCaption: "The smile that always brightens my day",
 };
 
-export type MemoryItem = {
+// Memory Constellation Orbit Items (preserves the 3D orbit concept with enhanced Polaroid visuals)
+export type OrbitMemory = {
+  id: string;
+  image: StaticImageData;
+  caption: string;
+  alt: string;
+  note: string;
+  date?: string;
+  tapeColor?: string;
+};
+
+export const orbitMemories: OrbitMemory[] = [
+  {
+    id: "orbit-1",
+    image: couplePhoto,
+    caption: "right beside you",
+    alt: "Alura and Rifky together",
+    note: "My favorite place in the world is right here, with your hand in mine.",
+    date: "A special frame",
+    tapeColor: "#F4D1D5",
+  },
+  {
+    id: "orbit-2",
+    image: ghisccaPortrait,
+    caption: "that gentle light",
+    alt: "Soft smiling portrait of Alura",
+    note: "I love the way your eyes crinkle when you're genuinely smiling.",
+    date: "Just you",
+    tapeColor: "#E8B5C0",
+  },
+  {
+    id: "orbit-3",
+    image: blondePortrait,
+    caption: "silly photo strips",
+    alt: "Playful photo strip of Alura",
+    note: "Every little version of you, laughter and goofy poses included.",
+    date: "Photo booth day",
+    tapeColor: "#D58C9C",
+  },
+  {
+    id: "orbit-4",
+    image: smilePortrait,
+    caption: "the sweetest smile",
+    alt: "Warm smiling portrait of Alura",
+    note: "The smile that makes every ordinary day feel warm and meaningful.",
+    date: "Pure joy",
+    tapeColor: "#F4D1D5",
+  },
+  {
+    id: "orbit-5",
+    image: candidPortrait,
+    caption: "simply beautiful",
+    alt: "Candid portrait of Alura",
+    note: "Completely natural, unposed, and effortlessly glowing.",
+    date: "Candid afternoon",
+    tapeColor: "#E8B5C0",
+  },
+  {
+    id: "orbit-6",
+    image: blackAndWhitePhoto,
+    caption: "frozen in time",
+    alt: "Black and white memory of Alura",
+    note: "Proof that warmth and love never lose their color.",
+    date: "Timeless moment",
+    tapeColor: "#D58C9C",
+  },
+  {
+    id: "orbit-7",
+    image: sittingPortrait,
+    caption: "a quiet afternoon",
+    alt: "Alura at a quiet table",
+    note: "Sitting across from you, wishing the afternoon would never end.",
+    date: "Cozy café",
+    tapeColor: "#F4D1D5",
+  },
+  {
+    id: "orbit-8",
+    image: sleepcallPhoto,
+    caption: "in between the hours",
+    alt: "Sleepcall night moment",
+    note: "Whispering through the screen until sleep gently took over.",
+    date: "Late night whispers",
+    tapeColor: "#E8B5C0",
+  },
+];
+
+// Section 6: The Little Things I Love About You (Interactive scrapbook favorites)
+export type FavoriteThing = {
+  id: string;
+  name: string;
+  category: string;
+  iconType: string;
+  message: string;
+  accentColor: string;
+};
+
+export const favoriteThings: FavoriteThing[] = [
+  {
+    id: "lily",
+    name: "Pink Lilies",
+    category: "Signature Flower",
+    iconType: "lily",
+    message: "Somehow, lilies will always remind me of you. Soft, elegant, and completely rare.",
+    accentColor: "#F4D1D5",
+  },
+  {
+    id: "butterfly",
+    name: "Butterflies",
+    category: "Little Wonders",
+    iconType: "butterfly",
+    message: "I hope you never stop finding happiness in little things, drifting freely and lighthearted.",
+    accentColor: "#E8B5C0",
+  },
+  {
+    id: "pink",
+    name: "Pink Everything",
+    category: "Signature Color",
+    iconType: "sparkle",
+    message: "Your favorite color that makes everything around you feel soft, warm, and gentle.",
+    accentColor: "#D58C9C",
+  },
+  {
+    id: "matcha",
+    name: "Matcha Latte",
+    category: "Comfort Drink",
+    iconType: "cup",
+    message: "Remembering how much you love your sweet matcha treat on quiet afternoons.",
+    accentColor: "#C7D4B6",
+  },
+  {
+    id: "cappuccino",
+    name: "Cappuccino",
+    category: "Cozy Coffee",
+    iconType: "coffee",
+    message: "The warm aroma and cozy conversations that always feel far too short.",
+    accentColor: "#D2B48C",
+  },
+  {
+    id: "icecream",
+    name: "Ice Cream",
+    category: "Sweet Treats",
+    iconType: "icecream",
+    message: "Sweet, cold, and guaranteed to put an instant happy smile on your face.",
+    accentColor: "#FDE2E8",
+  },
+  {
+    id: "bakso",
+    name: "Bakso",
+    category: "Favorite Food",
+    iconType: "bowl",
+    message: "How your eyes light up whenever we eat warm, savory bakso together after a long day.",
+    accentColor: "#E8C8B5",
+  },
+  {
+    id: "noodles",
+    name: "Noodles",
+    category: "Late Night Cravings",
+    iconType: "noodles",
+    message: "All the spontaneous noodle cravings and laughs we share over hot bowls.",
+    accentColor: "#F4D1D5",
+  },
+  {
+    id: "dimsum",
+    name: "Dimsum",
+    category: "Snack Favorite",
+    iconType: "dimsum",
+    message: "Steaming hot dimsum and how you always pick your favorite ones first with a grin.",
+    accentColor: "#E8B5C0",
+  },
+  {
+    id: "brownies",
+    name: "Brownies",
+    category: "Chocolate Comfort",
+    iconType: "cake",
+    message: "Rich, chocolatey, and one of your favorite little comfort bites when you need warmth.",
+    accentColor: "#8B5A2B",
+  },
+  {
+    id: "cookies",
+    name: "Soft Cookies",
+    category: "Sweet Bakes",
+    iconType: "cookie",
+    message: "Chewy, sweet little treats that brighten up ordinary days and make life sweeter.",
+    accentColor: "#D58C9C",
+  },
+];
+
+// Section 7: Nostalgic Scrapbook Moments
+export type ScrapbookMoment = {
   id: string;
   image: StaticImageData;
   title: string;
-  note: string;
   caption: string;
-  alt: string;
-  tag?: string;
+  date: string;
+  tapeRotation: number;
+  rotation: number;
+  tag: string;
 };
 
-export const memories: MemoryItem[] = [
+export const scrapbookMoments: ScrapbookMoment[] = [
   {
-    id: "berdua",
+    id: "moment-1",
     image: couplePhoto,
-    title: "Right Beside You",
-    note: "Some memories never really leave.",
-    caption: "A frame I keep close because you were right there beside me.",
-    alt: "A close photo of Alura and Rifky together",
-    tag: "MEM_01 // TOGETHER",
+    title: "Side by Side",
+    caption: "The world feels so quiet and safe whenever I'm holding your hand.",
+    date: "One frame, both of us",
+    tapeRotation: -4,
+    rotation: -1.5,
+    tag: "US // MEMORY_01",
   },
   {
-    id: "ghiscca",
-    image: ghisccaPortrait,
-    title: "That Gentle Light",
-    note: "I don't think I ever told you enough how beautiful you are to me.",
-    caption: "The quiet warmth in your eyes that always made everything feel alright.",
-    alt: "A cherished portrait of Alura smiling",
-    tag: "MEM_02 // PORTRAIT",
-  },
-  {
-    id: "blonde",
-    image: blondePortrait,
-    title: "Little Versions of Your Joy",
-    note: "The silly photo strips and genuine laughter.",
-    caption: "You had a way of turning an ordinary afternoon into something unforgettable.",
-    alt: "Playful photo strip of Alura",
-    tag: "MEM_03 // MOMENTS",
-  },
-  {
-    id: "simanis",
-    image: smilePortrait,
-    title: "The Sweetest Smile",
-    note: "If I could choose again, I'd still want to know you.",
-    caption: "A smile that could instantly brighten even the heaviest days.",
-    alt: "Alura smiling warmly",
-    tag: "MEM_04 // SMILE",
-  },
-  {
-    id: "cantik",
+    id: "moment-2",
     image: candidPortrait,
-    title: "Simply You",
-    note: "I wish I could have given you more beautiful moments.",
-    caption: "Completely natural, unposed, and effortlessly radiant.",
-    alt: "A candid portrait of Alura",
-    tag: "MEM_05 // CANDID",
+    title: "Completely You",
+    caption: "Looking back at this, I'm reminded how easy it is to adore everything about you.",
+    date: "Candid sunshine",
+    tapeRotation: 3,
+    rotation: 2,
+    tag: "ALURA // MEMORY_02",
   },
   {
-    id: "bw",
-    image: blackAndWhitePhoto,
-    title: "Frozen in Time",
-    note: "Black and white, but the warmth from that day has never faded.",
-    caption: "Proof that some moments don't lose their color, even when time moves forward.",
-    alt: "Black and white photo booth memory",
-    tag: "MEM_06 // BOOTH",
+    id: "moment-3",
+    image: blondePortrait,
+    title: "Laughter in Four Takes",
+    caption: "The spontaneous goofy faces in the photo booth that make me laugh every time.",
+    date: "Photo booth day",
+    tapeRotation: -2,
+    rotation: -2.5,
+    tag: "SMILES // MEMORY_03",
   },
   {
-    id: "slipkol",
-    image: sleepcallPhoto,
-    title: "Late Night Whispers",
-    note: "Quiet nights when time seemed to pause for us.",
-    caption: "Falling asleep with the phone still connected, feeling close across the distance.",
-    alt: "A quiet late-night moment",
-    tag: "MEM_07 // NIGHTS",
-  },
-  {
-    id: "lura",
+    id: "moment-4",
     image: favoritePortrait,
-    title: "Always Cherished",
-    note: "Even now, I still find myself wishing we had more tomorrows.",
-    caption: "A picture I find myself looking back at, remembering the person I love.",
-    alt: "Portrait of Alura",
-    tag: "MEM_08 // CHERISHED",
+    title: "A Favorite View",
+    caption: "I could look at this picture a hundred times and still stop to admire you.",
+    date: "My favorite view",
+    tapeRotation: 5,
+    rotation: 1.8,
+    tag: "CHERISHED // MEMORY_04",
   },
   {
-    id: "recent",
+    id: "moment-5",
     image: recentMemory,
-    title: "In My Heart",
-    note: "You will always have a special place in my heart.",
-    caption: "No matter how circumstances change, my care for you remains genuine.",
-    alt: "A recent photograph of Alura",
-    tag: "MEM_09 // TIMELESS",
+    title: "Our Story Continues",
+    caption: "Growing alongside you, learning to understand and love each other better every day.",
+    date: "October days",
+    tapeRotation: -3,
+    rotation: -1,
+    tag: "JOURNEY // MEMORY_05",
+  },
+  {
+    id: "moment-6",
+    image: smilePortrait,
+    title: "Sweet Light",
+    caption: "Your warmth is like a quiet shelter on days that feel overwhelming.",
+    date: "Quiet joy",
+    tapeRotation: 4,
+    rotation: 2.2,
+    tag: "WARMTH // MEMORY_06",
   },
 ];
 
-export const orbitMemories = [
-  { image: couplePhoto, caption: "right beside you", alt: "Alura and Rifky together", quote: "Some memories never really leave." },
-  { image: ghisccaPortrait, caption: "that gentle light", alt: "Alura smiling softly", quote: "I don't think I ever told you enough how beautiful you are to me." },
-  { image: blondePortrait, caption: "your silly joy", alt: "Photo strip of Alura", quote: "If I could choose again, I'd still want to know you." },
-  { image: smilePortrait, caption: "the sweetest smile", alt: "Warm smile of Alura", quote: "You will always have a special place in my heart." },
-  { image: candidPortrait, caption: "effortlessly beautiful", alt: "Candid portrait of Alura", quote: "I wish I could have given you more beautiful moments." },
-  { image: blackAndWhitePhoto, caption: "frozen in time", alt: "Black and white memory", quote: "Even now, I still find myself wishing we had more tomorrows." },
-  { image: sittingPortrait, caption: "a quiet afternoon", alt: "Alura sitting at a table", quote: "You're still someone very special to me." },
-  { image: sleepcallPhoto, caption: "in between the hours", alt: "Sleepcall memory", quote: "Some memories never fade." },
+// Film Strip Webcam Snaps for authentic scrapbook collage
+export const filmstripSnaps = [webcam1, webcam2, webcam3, webcam4];
+
+// Section 9: A Little Promise
+export const littlePromises = [
+  "I know love is not about being perfect.",
+  "I want to keep learning how to love you better.",
+  "I want to make more little memories with you.",
+  "I want to be someone you can feel safe and happy with.",
+  "Not just for the beautiful days, but for the ordinary ones too.",
 ];
 
-export const personalQuotes = [
-  "You're still someone very special to me.",
-  "I don't think I ever told you enough how beautiful you are to me.",
-  "Some memories never really leave.",
-  "If I could choose again, I'd still want to know you.",
-  "I wish I could have given you more beautiful moments.",
-  "Even now, I still find myself wishing we had more tomorrows.",
-  "You will always have a special place in my heart.",
-];
-
+// Section 10: Foundation Letter
 export const foundationLetter = [
   "Dear Alura,",
-  "I don't really know how to put all of this into words.",
-  "I just know that you mean so much to me.",
-  "I'm sorry for the moments when I wasn't the person you needed me to be. I know I wasn't perfect, and there are things I wish I could have done differently.",
-  "I once imagined having so many more tomorrows with you. I wanted to keep making memories, laughing together, and experiencing all the little things life had waiting for us.",
-  "Even though things are different now, I still care about you. I still love you more than I can properly explain.",
-  "A part of me still wishes we could have stayed together longer. I wish I could have loved you better and given you more reasons to smile.",
-  "I don't know what the future holds, and I don't want to ask anything from you through these words.",
-  "I just want you to know that what we shared mattered to me.",
-  "Thank you for being part of my story, Alura.",
-  "You will always be someone I hold dear.",
-  "With love,",
+  "I just want you to know how happy I am that we are finding our way forward together.",
+  "I know I haven't always been perfect. There are things I wish I had done differently, and I still have so much to learn.",
+  "But I want to keep trying.",
+  "I want more ordinary mornings, random conversations, little adventures, silly laughter, and all the small things that make being with you special.",
+  "I don't want to take those moments for granted.",
+  "I want to love you better, listen more, understand you more, and keep growing alongside you.",
+  "Thank you for being you, Alura.",
+  "And if I could choose again, I'd still choose you.",
+  "Here's to more memories, more laughter, and more pages of our story.",
+  "With all my love,",
   "Rifky",
 ];
 
-export const hiddenParticleMessage =
-  "Wherever life leads you, Alura, I will always be quietly rooting for your happiness.";
-
-export const endingLines = [
-  "Thank you for being part of my life.",
-  "I wish we could have had more tomorrows.",
-  "Whatever happens, I hope life is gentle with you.",
-];
-
-export const endingSignature = {
-  for: "For Alura.",
-  from: "With love, Rifky.",
+// Section 11: Final Scene
+export const finalScene = {
+  lines: [
+    "There's still so much life to experience.",
+    "More little moments to collect.",
+    "More reasons to smile.",
+    "And so many pages left to write.",
+  ],
+  dedication: "For you, Alura.",
+  signature: "With love, Rifky.",
   photo: couplePhoto,
-  alt: "Alura and Rifky together, cherished forever",
 };

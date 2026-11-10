@@ -1,24 +1,35 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import Image, { type StaticImageData } from "next/image";
-import { X, Sparkles, Eye, RotateCw } from "lucide-react";
+import Image from "next/image";
+import { X, Sparkles, RotateCw, ArrowLeft } from "lucide-react";
 import gsap from "gsap";
-import { orbitMemories, recipientName, hiddenParticleMessage } from "@/lib/love-story";
+import PinkLily from "@/components/pink-lily";
+import { orbitMemories, type OrbitMemory, recipientName } from "@/lib/love-story";
 
-type OrbitMemory = {
-  image: StaticImageData;
-  caption: string;
-  alt: string;
-  quote: string;
-};
-
-type Star = {
+type Particle = {
   x: number;
   y: number;
+  originX: number;
+  originY: number;
   size: number;
+  color: string;
   alpha: number;
+  baseAlpha: number;
   speed: number;
+  phase: number;
+};
+
+type BurstPetal = {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  size: number;
+  rotation: number;
+  rotSpeed: number;
+  alpha: number;
+  color: string;
 };
 
 export default function MemoryOrbit() {
@@ -26,7 +37,10 @@ export default function MemoryOrbit() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const angleRef = useRef<number>(0);
-  const velocityRef = useRef<number>(0.0015);
+  const velocityRef = useRef<number>(0.0018);
+  const heartExpansionRef = useRef<number>(1);
+  const orbitPushRef = useRef<number>(0);
+
   const dragRef = useRef<{ isDragging: boolean; startX: number; startAngle: number; moved: boolean }>({
     isDragging: false,
     startX: 0,
@@ -34,9 +48,12 @@ export default function MemoryOrbit() {
     moved: false,
   });
 
-  const [activeMemory, setActiveMemory] = useState<OrbitMemory | null>(null);
-  const [showHiddenMessage, setShowHiddenMessage] = useState(false);
+  const [activePhoto, setActivePhoto] = useState<OrbitMemory | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
+
+  const particlesRef = useRef<Particle[]>([]);
+  const burstPetalsRef = useRef<BurstPetal[]>([]);
+  const ripplesRef = useRef<{ radius: number; maxRadius: number; alpha: number }[]>([]);
 
   useEffect(() => {
     const q = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -46,7 +63,7 @@ export default function MemoryOrbit() {
     return () => q.removeEventListener("change", handler);
   }, []);
 
-  // 1. Particle Constellation & Heart Canvas
+  // 1. Central Particle Heart & Canvas Effects
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -54,74 +71,25 @@ export default function MemoryOrbit() {
     if (!ctx) return;
 
     let width = (canvas.width = canvas.offsetWidth || window.innerWidth);
-    let height = (canvas.height = canvas.offsetHeight || 600);
+    let height = (canvas.height = canvas.offsetHeight || 650);
 
     const handleResize = () => {
       if (!canvas) return;
       width = canvas.width = canvas.offsetWidth || window.innerWidth;
-      height = canvas.height = canvas.offsetHeight || 600;
+      height = canvas.height = canvas.offsetHeight || 650;
+      initHeartParticles();
     };
     window.addEventListener("resize", handleResize);
 
-    const stars: Star[] = Array.from({ length: 75 }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      size: Math.random() * 1.5 + 0.6,
-      alpha: Math.random() * 0.6 + 0.2,
-      speed: Math.random() * 0.001 + 0.0005,
-    }));
+    // Initialize mathematical heart points
+    const initHeartParticles = () => {
+      const points = 100;
+      const particles: Particle[] = [];
+      const colors = ["#FFF7F5", "#FCE8E8", "#F4D1D5", "#E8B5C0", "#D58C9C", "#A94F65"];
 
-    let animId: number;
-
-    const render = (time: number) => {
-      ctx.clearRect(0, 0, width, height);
-
-      // Read audio energy from CSS variable
-      const musicEnergy =
-        Number.parseFloat(
-          getComputedStyle(document.documentElement).getPropertyValue("--music-energy")
-        ) || 0;
-
-      // Draw starry constellation
-      for (let i = 0; i < stars.length; i++) {
-        const star = stars[i];
-        if (!reducedMotion) {
-          star.alpha = 0.25 + Math.sin(time * star.speed + i) * 0.35 + musicEnergy * 0.2;
-        }
-
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, star.size + musicEnergy * 0.5, 0, Math.PI * 2);
-        ctx.fillStyle = i % 5 === 0 ? "#ff8eb5" : "#ffffff";
-        ctx.globalAlpha = Math.max(0.1, Math.min(1, star.alpha));
-        ctx.fill();
-
-        // Connect nearby stars with delicate lines
-        if (i % 6 === 0 && i + 1 < stars.length) {
-          const neighbor = stars[i + 1];
-          const dist = Math.hypot(neighbor.x - star.x, neighbor.y - star.y);
-          if (dist < 120) {
-            ctx.beginPath();
-            ctx.moveTo(star.x, star.y);
-            ctx.lineTo(neighbor.x, neighbor.y);
-            ctx.strokeStyle = "rgba(255, 140, 180, 0.12)";
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        }
-      }
-
-      // Draw Center Particle Heart
-      const centerX = width * 0.5;
-      const centerY = height * 0.5;
-      const heartPoints = 84;
-      const baseScale = Math.min(width, height) * 0.0042;
-      const pulse = 1 + Math.sin(time * 0.003) * 0.04 + musicEnergy * 0.12;
-      const scale = baseScale * pulse;
-
-      ctx.save();
-      for (let i = 0; i < heartPoints; i++) {
-        const t = (i / heartPoints) * Math.PI * 2;
-        // Mathematical Heart Curve
+      for (let i = 0; i < points; i++) {
+        const t = (i / points) * Math.PI * 2;
+        // Mathematical Heart formula
         const hx = 16 * Math.pow(Math.sin(t), 3);
         const hy = -(
           13 * Math.cos(t) -
@@ -130,18 +98,115 @@ export default function MemoryOrbit() {
           Math.cos(4 * t)
         );
 
-        const px = centerX + hx * scale;
-        const py = centerY + hy * scale;
+        particles.push({
+          x: hx,
+          y: hy,
+          originX: hx,
+          originY: hy,
+          size: Math.random() * 1.8 + 1.2,
+          color: colors[i % colors.length],
+          alpha: Math.random() * 0.4 + 0.6,
+          baseAlpha: Math.random() * 0.4 + 0.6,
+          speed: Math.random() * 0.002 + 0.001,
+          phase: Math.random() * Math.PI * 2,
+        });
+      }
+      particlesRef.current = particles;
+    };
+
+    initHeartParticles();
+    let animId: number;
+
+    const render = (time: number) => {
+      ctx.clearRect(0, 0, width, height);
+      const centerX = width * 0.5;
+      const centerY = height * 0.5;
+
+      const musicEnergy =
+        Number.parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue("--music-energy")
+        ) || 0;
+
+      // Draw soft pink ripples expanding
+      const ripples = ripplesRef.current;
+      for (let i = ripples.length - 1; i >= 0; i--) {
+        const rip = ripples[i];
+        rip.radius += 4.5;
+        rip.alpha *= 0.96;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, rip.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(213, 140, 156, ${rip.alpha})`;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+
+        if (rip.alpha < 0.01 || rip.radius > rip.maxRadius) {
+          ripples.splice(i, 1);
+        }
+      }
+
+      // Draw burst petals
+      const burstPetals = burstPetalsRef.current;
+      for (let i = burstPetals.length - 1; i >= 0; i--) {
+        const bp = burstPetals[i];
+        bp.x += bp.vx;
+        bp.y += bp.vy;
+        bp.rotation += bp.rotSpeed;
+        bp.alpha *= 0.97;
+
+        ctx.save();
+        ctx.translate(bp.x, bp.y);
+        ctx.rotate(bp.rotation);
+        ctx.globalAlpha = bp.alpha;
+        ctx.fillStyle = bp.color;
 
         ctx.beginPath();
-        ctx.arc(px, py, 1.2 + musicEnergy * 0.8, 0, Math.PI * 2);
-        ctx.fillStyle = i % 2 === 0 ? "#ff699a" : "#fff0f5";
-        ctx.globalAlpha = 0.35 + Math.sin(time * 0.002 + i) * 0.2 + musicEnergy * 0.3;
-        ctx.shadowColor = "#ff4d8d";
+        ctx.moveTo(0, -bp.size);
+        ctx.bezierCurveTo(bp.size * 0.6, -bp.size * 0.6, bp.size * 0.8, bp.size * 0.5, 0, bp.size);
+        ctx.bezierCurveTo(-bp.size * 0.8, bp.size * 0.5, -bp.size * 0.6, -bp.size * 0.6, 0, -bp.size);
+        ctx.fill();
+        ctx.restore();
+
+        if (bp.alpha < 0.02) {
+          burstPetals.splice(i, 1);
+        }
+      }
+
+      // Heart base scale with heartbeat pulse
+      const baseScale = Math.min(width, height) * 0.0044;
+      const pulse =
+        (1 + Math.sin(time * 0.0035) * 0.045 + musicEnergy * 0.12) * heartExpansionRef.current;
+      const scale = baseScale * pulse;
+
+      // Soft center halo glow
+      const haloGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 80 * scale);
+      haloGrad.addColorStop(0, "rgba(244, 209, 213, 0.45)");
+      haloGrad.addColorStop(0.6, "rgba(232, 181, 192, 0.2)");
+      haloGrad.addColorStop(1, "rgba(255, 247, 245, 0)");
+      ctx.fillStyle = haloGrad;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 80 * scale, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Render Heart Particles
+      const particles = particlesRef.current;
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        const px = centerX + p.x * scale;
+        const py = centerY + p.y * scale;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(px, py, p.size + musicEnergy * 0.8, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = Math.min(1, p.alpha + musicEnergy * 0.25);
+        ctx.shadowColor = "#D58C9C";
         ctx.shadowBlur = 6;
         ctx.fill();
+        ctx.restore();
       }
-      ctx.restore();
 
       animId = requestAnimationFrame(render);
     };
@@ -152,18 +217,19 @@ export default function MemoryOrbit() {
       window.removeEventListener("resize", handleResize);
       cancelAnimationFrame(animId);
     };
-  }, [reducedMotion]);
+  }, []);
 
-  // 2. 3D Orbit Layout & Physics Loop
+  // 2. 3D Multi-Layer Orbit Layout Loop
   useEffect(() => {
     const world = worldRef.current;
     if (!world) return;
 
-    const cards = Array.from(world.querySelectorAll<HTMLElement>(".orbit-card"));
+    const cards = Array.from(world.querySelectorAll<HTMLElement>(".orbit-polaroid-item"));
     let animId: number;
 
     const tick = () => {
-      if (!dragRef.current.isDragging) {
+      // Natural orbit rotation if not dragging and not zoomed into a photo
+      if (!dragRef.current.isDragging && !activePhoto) {
         angleRef.current += velocityRef.current;
       }
 
@@ -171,14 +237,20 @@ export default function MemoryOrbit() {
       const w = rect.width;
       const h = rect.height;
 
-      // Responsive orbit radii
       const isMobile = w < 640;
       const isTablet = w >= 640 && w < 1100;
-      const radiusX = isMobile ? w * 0.38 : isTablet ? w * 0.4 : Math.min(w * 0.38, 520);
-      const radiusY = isMobile ? h * 0.22 : isTablet ? h * 0.26 : Math.min(h * 0.28, 200);
+
+      // Multiple invisible orbital paths with responsive radii
+      const baseRadiusX = isMobile ? w * 0.38 : isTablet ? w * 0.41 : Math.min(w * 0.38, 540);
+      const baseRadiusY = isMobile ? h * 0.24 : isTablet ? h * 0.27 : Math.min(h * 0.29, 210);
 
       const count = cards.length;
       cards.forEach((card, index) => {
+        // Multi-layer depth factor: alternate photos on slightly different orbits
+        const layer = index % 2 === 0 ? 1.0 : 1.15;
+        const radiusX = (baseRadiusX + orbitPushRef.current) * layer;
+        const radiusY = (baseRadiusY + orbitPushRef.current * 0.5) * layer;
+
         const offset = (index / count) * Math.PI * 2;
         const currentAngle = angleRef.current + offset;
 
@@ -186,10 +258,12 @@ export default function MemoryOrbit() {
         const y = Math.sin(currentAngle) * radiusY;
         const z = Math.sin(currentAngle); // -1 (back) to +1 (front)
 
-        // Depth projection
+        // Project 3D depth to 2D scale and opacity
         const depthNorm = (z + 1) * 0.5; // 0 to 1
         const scale = 0.72 + depthNorm * 0.38;
-        const opacity = 0.35 + depthNorm * 0.65;
+        const opacity = activePhoto
+          ? 0.2 // dims background if one photo is zoomed
+          : 0.45 + depthNorm * 0.55;
         const zIndex = Math.round(depthNorm * 100);
 
         card.style.transform = `translate3d(${x}px, ${y}px, 0px) scale(${scale})`;
@@ -203,9 +277,9 @@ export default function MemoryOrbit() {
     animId = requestAnimationFrame(tick);
 
     return () => cancelAnimationFrame(animId);
-  }, []);
+  }, [activePhoto]);
 
-  // Pointer & Touch Controls
+  // Pointer drag controls (Mouse, Touch, Stylus)
   const handlePointerDown = (e: React.PointerEvent) => {
     dragRef.current = {
       isDragging: true,
@@ -218,7 +292,7 @@ export default function MemoryOrbit() {
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!dragRef.current.isDragging) return;
     const deltaX = e.clientX - dragRef.current.startX;
-    if (Math.abs(deltaX) > 4) {
+    if (Math.abs(deltaX) > 5) {
       dragRef.current.moved = true;
     }
     angleRef.current = dragRef.current.startAngle + deltaX * 0.005;
@@ -228,165 +302,198 @@ export default function MemoryOrbit() {
     dragRef.current.isDragging = false;
   };
 
-  const handleCardClick = (memory: OrbitMemory) => {
+  // Heart Tap: Ripple, petal burst, photos push outward
+  const handleHeartClick = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const centerX = canvas.width * 0.5;
+    const centerY = canvas.height * 0.5;
+
+    // 1. Expand ripple
+    ripplesRef.current.push({
+      radius: 20,
+      maxRadius: Math.max(canvas.width, canvas.height) * 0.6,
+      alpha: 0.9,
+    });
+
+    // 2. Petal burst in 360 degrees
+    const petalColors = ["#FFF7F5", "#FCE8E8", "#F4D1D5", "#D58C9C"];
+    const burst: BurstPetal[] = [];
+    for (let i = 0; i < 28; i++) {
+      const angle = (i / 28) * Math.PI * 2;
+      const speed = Math.random() * 5 + 3.5;
+      burst.push({
+        x: centerX,
+        y: centerY,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: Math.random() * 8 + 6,
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.05,
+        alpha: 1,
+        color: petalColors[i % petalColors.length],
+      });
+    }
+    burstPetalsRef.current.push(...burst);
+
+    // 3. Heart pulse & photos push outward then return
+    gsap.timeline()
+      .to(heartExpansionRef, { current: 1.4, duration: 0.25, ease: "back.out(2)" })
+      .to(heartExpansionRef, { current: 1.0, duration: 0.5, ease: "power2.out" });
+
+    gsap.timeline()
+      .to(orbitPushRef, { current: 55, duration: 0.35, ease: "power2.out" })
+      .to(orbitPushRef, { current: 0, duration: 0.8, ease: "elastic.out(1, 0.45)" });
+  };
+
+  const handlePhotoClick = (photo: OrbitMemory) => {
     if (dragRef.current.moved) return;
-    setActiveMemory(memory);
+    setActivePhoto(photo);
   };
 
   return (
-    <section className="relative w-full py-16 sm:py-24 overflow-hidden select-none">
+    <section className="relative w-full py-16 sm:py-24 overflow-hidden select-none bg-gradient-to-b from-[#FFF7F5] via-[#FCE8E8]/40 to-[#FFF7F5]">
+      {/* Decorative Corner Lilies */}
+      <div className="absolute top-10 left-6 opacity-40 pointer-events-none hidden md:block">
+        <PinkLily size={80} />
+      </div>
+      <div className="absolute bottom-10 right-6 opacity-40 pointer-events-none hidden md:block">
+        <PinkLily size={80} />
+      </div>
+
       {/* Section Header */}
-      <div className="max-w-4xl mx-auto px-4 text-center mb-8 relative z-20">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-rose-500/20 bg-rose-950/30 text-[11px] font-mono tracking-widest text-rose-300 uppercase mb-3">
-          <Sparkles size={12} className="text-rose-400" />
-          <span>Interactive Constellation // Memories of Alura</span>
+      <div className="max-w-3xl mx-auto px-4 text-center mb-8 relative z-20">
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full border border-[#D58C9C]/40 bg-[#FCE8E8]/80 text-[11px] font-mono tracking-widest text-[#702C43] uppercase mb-3">
+          <Sparkles size={12} className="text-[#A94F65]" />
+          <span>Memory Constellation // Photo Orbit</span>
         </div>
-        <h2 className="text-3xl sm:text-5xl font-serif text-white tracking-tight mb-3">
-          The Orbit of Our Moments
+        <h2 className="text-3xl sm:text-5xl font-serif text-[#702C43] tracking-tight mb-3 font-normal">
+          The Orbit of Our Memories
         </h2>
-        <p className="text-sm sm:text-base text-rose-200/60 max-w-lg mx-auto font-light leading-relaxed">
-          Drag to rotate the memories floating around your constellation. Click any photograph to read what it holds.
+        <p className="text-sm sm:text-base text-[#A94F65] max-w-lg mx-auto font-light leading-relaxed">
+          Surrounding the heart are our real moments. Drag to spin the constellation, tap a Polaroid to look closer, or tap the heart to send petals blooming.
         </p>
       </div>
 
-      {/* Orbit Container with Canvas Background */}
+      {/* 3D Orbit Viewport with Canvas Background */}
       <div
         ref={worldRef}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerLeave={handlePointerUp}
-        className="relative w-full h-[460px] sm:h-[540px] md:h-[600px] flex items-center justify-center cursor-grab active:cursor-grabbing touch-none"
+        className="relative w-full h-[500px] sm:h-[580px] md:h-[640px] flex items-center justify-center cursor-grab active:cursor-grabbing touch-none perspective-1000"
       >
         <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" />
 
-        {/* Central Pulse Centerpiece with Name */}
-        <div className="absolute z-10 flex flex-col items-center justify-center pointer-events-none">
-          <div className="text-[10px] font-mono tracking-[0.3em] uppercase text-rose-300/40 mb-1">
-            CENTER OF MEMORY
-          </div>
-          <div className="font-serif text-2xl sm:text-3xl font-light text-rose-100/90 tracking-widest">
-            {recipientName}
-          </div>
-        </div>
-
-        {/* Hidden Interactive Star trigger */}
+        {/* Central Particle Heart Tap Trigger Area */}
         <button
           type="button"
-          onClick={() => setShowHiddenMessage(true)}
-          className="group absolute top-12 right-8 sm:right-16 z-30 flex items-center gap-2 px-3 py-1.5 rounded-full border border-rose-500/30 bg-black/50 backdrop-blur-md text-[11px] font-mono text-rose-200/80 hover:text-white hover:border-rose-400 transition-all cursor-pointer shadow-[0_0_15px_rgba(255,77,141,0.2)]"
-          title="A hidden message for Alura"
+          onClick={handleHeartClick}
+          className="group absolute z-15 flex flex-col items-center justify-center w-36 h-36 rounded-full cursor-pointer transition-transform hover:scale-105 active:scale-95"
+          title="Tap heart to pulse"
+          aria-label="Pulse heart"
         >
-          <span className="w-2 h-2 rounded-full bg-rose-400 animate-ping" />
-          <span>A Delicate Message Hidden Here</span>
+          <span className="text-[9px] font-mono tracking-[0.25em] uppercase text-[#A94F65]/70 mb-1 group-hover:text-[#702C43]">
+            TAP HEART
+          </span>
+          <span className="font-serif text-2xl sm:text-3xl text-[#702C43] tracking-wide font-normal">
+            {recipientName}
+          </span>
         </button>
 
-        {/* Floating Memory Cards */}
-        {orbitMemories.map((memory, index) => (
+        {/* Orbiting Polaroid Memory Frames */}
+        {orbitMemories.map((photo, index) => (
           <div
-            key={index}
-            onClick={() => handleCardClick(memory)}
-            className="orbit-card absolute top-1/2 left-1/2 -ml-16 sm:-ml-20 -mt-20 sm:-mt-24 w-32 sm:w-40 h-40 sm:h-48 rounded-xl bg-gradient-to-b from-stone-900/90 to-black/95 p-2 sm:p-2.5 border border-rose-500/25 shadow-[0_10px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(255,77,141,0.15)] flex flex-col cursor-pointer transition-shadow hover:border-rose-300 hover:shadow-[0_0_25px_rgba(255,77,141,0.4)]"
+            key={photo.id}
+            onClick={() => handlePhotoClick(photo)}
+            className="orbit-polaroid-item absolute top-1/2 left-1/2 -ml-20 sm:-ml-24 -mt-24 sm:-mt-28 w-40 sm:w-48 cursor-pointer select-none"
           >
-            <div className="relative w-full flex-1 rounded-lg overflow-hidden bg-black">
-              <Image
-                src={memory.image}
-                alt={memory.alt}
-                fill
-                sizes="(max-width: 640px) 130px, 160px"
-                className="object-cover transition-transform duration-500 hover:scale-105"
+            <div
+              className="polaroid-frame relative flex flex-col rounded bg-white shadow-md transition-all hover:scale-105"
+              style={{
+                transform: `rotate(${index % 2 === 0 ? "-2.5deg" : "2.5deg"})`,
+              }}
+            >
+              {/* Mini washi tape at top */}
+              <div
+                className="washi-tape top-[-8px] left-1/2 -translate-x-1/2 w-16"
+                style={{ backgroundColor: photo.tapeColor || "#F4D1D5" }}
               />
-            </div>
-            <div className="pt-2 text-center">
-              <span className="text-[10px] font-mono tracking-wider text-rose-200/80 uppercase truncate block">
-                {memory.caption}
-              </span>
+
+              {/* Photo inside Polaroid */}
+              <div className="relative w-full aspect-square rounded-sm overflow-hidden bg-[#FCE8E8]">
+                <Image
+                  src={photo.image}
+                  alt={photo.alt}
+                  fill
+                  sizes="(max-width: 640px) 150px, 190px"
+                  className="object-cover"
+                />
+              </div>
+
+              {/* Handwritten style caption */}
+              <div className="pt-2.5 pb-1 text-center">
+                <span className="font-serif italic text-xs text-[#702C43] tracking-wide block truncate">
+                  {photo.caption}
+                </span>
+                <span className="text-[8px] font-mono tracking-widest text-[#A94F65]/60 uppercase block">
+                  {photo.date}
+                </span>
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Detail Memory Modal when a card is clicked */}
-      {activeMemory && (
+      {/* Tapped Photo Detail Modal (Photo Approaches the Camera) */}
+      {activePhoto && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-[fadeIn_0.3s_ease-out]"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-[#FFF7F5]/90 backdrop-blur-md animate-[fadeIn_0.3s_ease-out]"
           role="dialog"
           aria-modal="true"
         >
-          <div className="relative w-full max-w-sm sm:max-w-md bg-[#160714] border border-rose-500/30 rounded-2xl p-5 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.9),0_0_30px_rgba(255,77,141,0.25)] flex flex-col items-center text-center">
+          <div className="relative w-full max-w-sm sm:max-w-md bg-white border border-[#F4D1D5] rounded-2xl p-6 shadow-[0_20px_50px_rgba(112,44,67,0.18)] flex flex-col items-center text-center">
+            {/* Top Washi Tape */}
+            <div className="washi-tape top-[-10px] left-1/2 -translate-x-1/2 w-28" />
+
             <button
               type="button"
-              onClick={() => setActiveMemory(null)}
-              className="absolute top-4 right-4 p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-              aria-label="Close"
+              onClick={() => setActivePhoto(null)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-[#FFF7F5] hover:bg-[#FCE8E8] text-[#702C43] transition-colors"
+              aria-label="Back to orbit"
             >
               <X size={16} />
             </button>
 
-            {/* Photo frame */}
-            <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden mb-4 border border-white/10 shadow-inner">
+            {/* Enlarged Photo Frame */}
+            <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden mb-4 bg-[#FCE8E8] border border-[#F4D1D5]">
               <Image
-                src={activeMemory.image}
-                alt={activeMemory.alt}
+                src={activePhoto.image}
+                alt={activePhoto.alt}
                 fill
+                sizes="(max-width: 640px) 320px, 420px"
                 className="object-cover"
-                sizes="(max-width: 640px) 300px, 400px"
               />
             </div>
 
-            <span className="text-[10px] font-mono tracking-widest text-rose-300/60 uppercase mb-1">
-              MEMORY // {activeMemory.caption}
+            <span className="text-[10px] font-mono tracking-widest text-[#A94F65] uppercase mb-1">
+              {activePhoto.date}
             </span>
-            <p className="font-serif text-lg sm:text-xl text-rose-100 italic leading-snug my-2">
-              &ldquo;{activeMemory.quote}&rdquo;
-            </p>
-
-            <span className="text-[10px] font-mono tracking-widest text-white/30 uppercase mt-4">
-              [ TAP OUTSIDE TO RETURN TO CONSTELLATION ]
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* Hidden Message Modal */}
-      {showHiddenMessage && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-[fadeIn_0.3s_ease-out]"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="relative w-full max-w-md bg-gradient-to-b from-[#25091c] to-[#12030d] border border-rose-400/40 rounded-2xl p-6 sm:p-8 text-center shadow-[0_0_40px_rgba(255,77,141,0.35)]">
-            <button
-              type="button"
-              onClick={() => setShowHiddenMessage(false)}
-              className="absolute top-4 right-4 p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-              aria-label="Close"
-            >
-              <X size={16} />
-            </button>
-
-            <div className="w-10 h-10 rounded-full bg-rose-500/20 border border-rose-400/40 flex items-center justify-center mx-auto mb-4 text-rose-300">
-              <Sparkles size={20} />
-            </div>
-
-            <span className="text-[10px] font-mono tracking-[0.25em] text-rose-300/60 uppercase">
-              A WHISPER AMONG THE PARTICLES
-            </span>
-
-            <h3 className="font-serif text-xl sm:text-2xl text-rose-100 font-light my-4 leading-relaxed">
-              &ldquo;{hiddenParticleMessage}&rdquo;
+            <h3 className="font-serif italic text-xl text-[#702C43] mb-2 font-medium">
+              &ldquo;{activePhoto.caption}&rdquo;
             </h3>
-
-            <p className="text-xs text-rose-200/50 leading-relaxed font-light mb-6">
-              Some thoughts don&apos;t ask for anything in return. They are simply true.
+            <p className="font-serif text-sm sm:text-base text-[#702C43]/90 leading-relaxed max-w-xs mb-6">
+              {activePhoto.note}
             </p>
 
             <button
               type="button"
-              onClick={() => setShowHiddenMessage(false)}
-              className="px-6 py-2 rounded-full border border-rose-400/30 bg-rose-950/50 text-rose-200 hover:text-white text-xs font-mono tracking-wider uppercase transition-colors"
+              onClick={() => setActivePhoto(null)}
+              className="inline-flex items-center gap-2 px-6 py-2 rounded-full border border-[#D58C9C] bg-[#FCE8E8] hover:bg-[#F4D1D5] text-[#702C43] text-xs font-mono tracking-wider uppercase transition-colors"
             >
-              Keep Close
+              <ArrowLeft size={14} />
+              <span>Back to Orbit</span>
             </button>
           </div>
         </div>
@@ -394,4 +501,3 @@ export default function MemoryOrbit() {
     </section>
   );
 }
-

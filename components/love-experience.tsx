@@ -10,7 +10,10 @@ import PersonalizedPreloader from "@/components/personalized-preloader";
 import FirstGreeting from "@/components/first-greeting";
 import WorldHero from "@/components/world-hero";
 import MemoryOrbit from "@/components/memory-orbit";
+import LittleThings from "@/components/little-things";
 import MemoryGallery from "@/components/memory-gallery";
+import RelationshipTimeline from "@/components/relationship-timeline";
+import LittlePromise from "@/components/little-promise";
 import InteractiveLetter from "@/components/interactive-letter";
 import PersonalizedEnding from "@/components/personalized-ending";
 
@@ -29,7 +32,7 @@ export default function LoveExperience() {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const lenis = new Lenis({
-      duration: reducedMotion ? 0.2 : 1.2,
+      duration: reducedMotion ? 0.2 : 1.15,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     });
     lenisRef.current = lenis;
@@ -55,51 +58,53 @@ export default function LoveExperience() {
   }, []);
 
   const handleGreetingEnter = useCallback(() => {
-    // Attempt playback on first explicit user enter
     audioPlayerRef.current?.play();
     setPhase("world");
   }, []);
 
   return (
-    <main className="relative min-h-screen bg-[#070306] text-white selection:bg-rose-500/30 selection:text-white">
+    <main className="relative min-h-screen bg-[#FFF7F5] text-[#702C43] selection:bg-[#F4D1D5] selection:text-[#702C43]">
       {/* Persistent Audio Manager */}
       <AudioPlayer ref={audioPlayerRef} autoPlayAttempt={true} />
 
-      {/* Subtle Grain Overlay */}
+      {/* Subtle Romantic Paper Grain Overlay */}
       <div className="film-grain" aria-hidden="true" />
 
-      {/* Ambient background glow */}
-      <div
-        className="fixed inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,15,45,0.25),rgba(255,255,255,0))] pointer-events-none z-0"
-        aria-hidden="true"
-      />
-
-      {/* Phase 1: Cinematic Personalized Preloader */}
+      {/* Phase 1: Blooming Lily Preloader */}
       {phase === "preloader" && (
         <PersonalizedPreloader onComplete={handlePreloaderComplete} />
       )}
 
-      {/* Phase 2: The First Greeting Modal */}
+      {/* Phase 2: The Welcome Screen with Alura's Polaroid */}
       {phase === "greeting" && (
         <FirstGreeting onEnter={handleGreetingEnter} />
       )}
 
-      {/* Phase 3: The Full World */}
+      {/* Phase 3: The Full Lily World */}
       {phase === "world" && (
         <div className="relative z-10 w-full animate-[fadeIn_0.8s_ease-out]">
-          {/* Hero Section */}
+          {/* Scrapbook Cover & Hero */}
           <WorldHero />
 
-          {/* Interactive Memory Constellation & 3D Orbit */}
+          {/* Memory Constellation Orbit (Crucial preserved feature) */}
           <MemoryOrbit />
 
-          {/* Sincere Memory Gallery Cards */}
+          {/* Section 6: The Little Things I Love About You (Alura's favorites) */}
+          <LittleThings />
+
+          {/* Section 7: Our Little Moments (Scrapbook Polaroids & Filmstrip) */}
           <MemoryGallery />
 
-          {/* Interactive Physical Letter & Foundation Message */}
+          {/* Section 8: Our Story Timeline (Dynamic relationship counter) */}
+          <RelationshipTimeline />
+
+          {/* Section 9: A Little Promise */}
+          <LittlePromise />
+
+          {/* Section 10: Personal Letter in Wax-Sealed Ribbon Envelope */}
           <InteractiveLetter />
 
-          {/* Personalized Quiet Ending */}
+          {/* Section 11: Final Hopeful Scene */}
           <PersonalizedEnding />
         </div>
       )}

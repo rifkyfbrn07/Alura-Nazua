@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { endingLines, endingSignature } from "@/lib/love-story";
+import PinkLily from "@/components/pink-lily";
+import { finalScene, recipientName } from "@/lib/love-story";
 
 export default function PersonalizedEnding() {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [revealedIndex, setRevealedIndex] = useState(-1);
 
   // Soft falling petals canvas
   useEffect(() => {
@@ -29,20 +29,20 @@ export default function PersonalizedEnding() {
     };
     window.addEventListener("resize", handleResize);
 
-    const petalColors = ["#ffd6e5", "#ffb3cc", "#ffffff", "#ffa1bf"];
-    const petals = Array.from({ length: 18 }, () => ({
+    const petalColors = ["#FFF7F5", "#FCE8E8", "#F4D1D5", "#E8B5C0", "#D58C9C"];
+    const petals = Array.from({ length: 20 }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      size: Math.random() * 7 + 5,
+      size: Math.random() * 8 + 6,
       rotation: Math.random() * Math.PI * 2,
       rotSpeed: (Math.random() - 0.5) * 0.015,
       vx: Math.random() * 0.4 - 0.2,
       vy: Math.random() * 0.6 + 0.3,
-      swingAmp: Math.random() * 1.2 + 0.4,
+      swingAmp: Math.random() * 1.4 + 0.4,
       swingSpeed: Math.random() * 0.018 + 0.008,
       phase: Math.random() * Math.PI * 2,
       color: petalColors[Math.floor(Math.random() * petalColors.length)],
-      alpha: Math.random() * 0.35 + 0.2,
+      alpha: Math.random() * 0.4 + 0.3,
     }));
 
     let animId: number;
@@ -103,7 +103,7 @@ export default function PersonalizedEnding() {
     };
   }, []);
 
-  // GSAP ScrollTrigger sequential text reveal
+  // GSAP ScrollTrigger
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
     const container = containerRef.current;
@@ -112,57 +112,36 @@ export default function PersonalizedEnding() {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const ctx = gsap.context(() => {
-      // Photo frame subtle fade and elevation
       gsap.fromTo(
-        ".ending-photo-frame",
-        { opacity: 0, scale: 0.94, filter: reducedMotion ? "none" : "blur(8px)" },
+        ".ending-photo",
+        { opacity: 0, y: 30, scale: 0.95 },
         {
           opacity: 1,
+          y: 0,
           scale: 1,
-          filter: "blur(0px)",
-          duration: reducedMotion ? 0.2 : 1.4,
-          ease: "power2.out",
+          duration: reducedMotion ? 0.2 : 1.1,
           scrollTrigger: {
-            trigger: ".ending-photo-frame",
-            start: "top 75%",
+            trigger: ".ending-photo",
+            start: "top 80%",
           },
         }
       );
 
-      // Sequential reveal of lines one at a time
-      endingLines.forEach((_, index) => {
+      finalScene.lines.forEach((_, index) => {
         gsap.fromTo(
           `.ending-line-${index}`,
-          { opacity: 0, y: 18, filter: reducedMotion ? "none" : "blur(6px)" },
+          { opacity: 0, y: 15 },
           {
             opacity: 1,
             y: 0,
-            filter: "blur(0px)",
-            duration: reducedMotion ? 0.2 : 1.1,
-            ease: "power2.out",
+            duration: reducedMotion ? 0.2 : 0.9,
             scrollTrigger: {
               trigger: `.ending-line-${index}`,
-              start: "top 82%",
+              start: "top 85%",
             },
           }
         );
       });
-
-      // Signature reveal
-      gsap.fromTo(
-        ".ending-signoff",
-        { opacity: 0, y: 15 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: reducedMotion ? 0.2 : 1.2,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: ".ending-signoff",
-            start: "top 88%",
-          },
-        }
-      );
     }, container);
 
     return () => ctx.revert();
@@ -171,63 +150,64 @@ export default function PersonalizedEnding() {
   return (
     <footer
       ref={containerRef}
-      className="relative w-full min-h-[90vh] py-24 px-4 flex flex-col items-center justify-center bg-gradient-to-b from-[#090308] via-[#140511] to-[#060205] text-center select-none overflow-hidden"
+      className="relative w-full min-h-[85vh] py-20 px-4 flex flex-col items-center justify-center bg-gradient-to-b from-[#FFF7F5] via-[#FCE8E8]/60 to-[#FFF0F3] text-center select-none overflow-hidden"
       role="contentinfo"
-      aria-label="Personalized ending for Alura"
+      aria-label="Final scene of Alura's Little Lily World"
     >
-      {/* Falling petals canvas */}
       <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" />
 
-      {/* Atmospheric deep wine glow */}
-      <div
-        className="absolute w-[min(90vw,700px)] aspect-square rounded-full bg-gradient-to-tr from-rose-950/30 via-wine-900/15 to-transparent filter blur-3xl pointer-events-none"
-        aria-hidden="true"
-      />
-
       <div className="relative z-10 max-w-xl w-full flex flex-col items-center">
-        {/* The One Meaningful Photograph left on screen */}
-        <div className="ending-photo-frame relative w-64 sm:w-72 md:w-80 aspect-[4/5] rounded-2xl overflow-hidden p-2.5 bg-gradient-to-b from-stone-800/60 to-black/90 border border-rose-500/20 shadow-[0_20px_50px_rgba(0,0,0,0.85),0_0_30px_rgba(255,77,141,0.15)] mb-12">
-          <div className="relative w-full h-full rounded-xl overflow-hidden bg-black">
-            <Image
-              src={endingSignature.photo}
-              alt={endingSignature.alt}
-              fill
-              sizes="(max-width: 640px) 260px, 320px"
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+        {/* The One Meaningful Photograph in a Romantic Polaroid */}
+        <div className="ending-photo relative mb-10">
+          <div className="washi-tape top-[-10px] left-1/2 -translate-x-1/2 w-28 -rotate-1" />
+          <div className="polaroid-frame w-56 sm:w-64 rotate-1 hover:rotate-0 transition-transform">
+            <div className="relative w-full aspect-[4/5] rounded overflow-hidden bg-[#FCE8E8]">
+              <Image
+                src={finalScene.photo}
+                alt="Alura and Rifky together"
+                fill
+                sizes="(max-width: 640px) 220px, 260px"
+                className="object-cover"
+                priority
+              />
+            </div>
+            <p className="font-serif italic text-xs text-[#702C43]/80 pt-3 text-center">
+              Our journey, one day at a time
+            </p>
+          </div>
+
+          {/* Signature Pink Lily Accent */}
+          <div className="absolute -bottom-5 -right-5 pointer-events-none">
+            <PinkLily size={60} />
           </div>
         </div>
 
-        {/* The quiet sequential lines */}
-        <div className="space-y-6 max-w-md mx-auto mb-14">
-          {endingLines.map((line, index) => (
+        {/* Sequential Hopeful & Warm Lines */}
+        <div className="space-y-4 max-w-md mx-auto mb-10">
+          {finalScene.lines.map((line, index) => (
             <p
               key={index}
-              className={`ending-line-${index} font-serif text-lg sm:text-2xl text-rose-100/90 font-light tracking-wide leading-relaxed`}
+              className={`ending-line-${index} font-serif text-lg sm:text-2xl text-[#702C43] font-light leading-relaxed`}
             >
               &ldquo;{line}&rdquo;
             </p>
           ))}
         </div>
 
-        {/* Personalized quiet dedication */}
-        <div className="ending-signoff flex flex-col items-center gap-2 pt-8 border-t border-rose-500/15 w-48">
-          <span className="font-serif text-xl sm:text-2xl text-rose-200 font-medium tracking-wide">
-            {endingSignature.for}
+        {/* Warm Dedication */}
+        <div className="pt-6 border-t border-[#F4D1D5] flex flex-col items-center gap-1.5 w-52">
+          <span className="font-serif text-2xl text-[#702C43] font-medium tracking-wide">
+            {finalScene.dedication}
           </span>
-          <span className="text-xs font-mono tracking-widest text-rose-300/50 uppercase">
-            {endingSignature.from}
+          <span className="text-xs font-mono tracking-widest text-[#A94F65] uppercase">
+            {finalScene.signature}
           </span>
         </div>
 
-        {/* Subtle timestamp */}
-        <div className="mt-12 text-[10px] font-mono tracking-[0.3em] text-white/20 uppercase">
-          GHISCCA ALURA NAZUA // DIGITAL HORIZON
-        </div>
+        <span className="mt-8 text-[9px] font-mono tracking-[0.25em] text-[#A94F65]/50 uppercase">
+          ALURA&apos;S LITTLE LILY WORLD // 2026
+        </span>
       </div>
     </footer>
   );
 }
-

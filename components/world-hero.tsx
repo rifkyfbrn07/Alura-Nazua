@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Sparkles, ArrowDown } from "lucide-react";
+import PinkLily from "@/components/pink-lily";
 import { recipientFullName, recipientName, creatorName } from "@/lib/love-story";
 import ghisccaPhoto from "@/image/Ghiscca.jpeg";
 
@@ -14,7 +15,7 @@ export default function WorldHero() {
       const now = new Date();
       const pad = (n: number) => String(n).padStart(2, "0");
       const dateStr = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())}`;
-      const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+      const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
       setTimestamp(`${dateStr} // ${timeStr}`);
     };
     updateTime();
@@ -23,67 +24,79 @@ export default function WorldHero() {
   }, []);
 
   return (
-    <header className="relative w-full min-h-[92vh] flex flex-col justify-between items-center px-4 sm:px-8 py-10 text-center select-none overflow-hidden">
-      {/* Top telemetry bar */}
-      <div className="w-full max-w-5xl flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-rose-300/40 uppercase pt-2">
+    <header className="relative w-full min-h-[90vh] flex flex-col justify-between items-center px-4 sm:px-8 py-8 text-center select-none overflow-hidden bg-gradient-to-b from-[#FFF7F5] via-[#FCE8E8]/50 to-[#FFF7F5]">
+      {/* Decorative Corner Lilies */}
+      <div className="absolute top-6 left-6 opacity-30 pointer-events-none hidden sm:block">
+        <PinkLily size={70} />
+      </div>
+      <div className="absolute top-6 right-20 opacity-30 pointer-events-none hidden sm:block">
+        <PinkLily size={70} />
+      </div>
+
+      {/* Top Telemetry / Scrapbook Header */}
+      <div className="w-full max-w-5xl flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] sm:text-[11px] font-mono tracking-widest text-[#A94F65]/80 uppercase pt-2">
         <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-[#D58C9C] animate-pulse" />
           <span>ORIGIN // {creatorName.toUpperCase()}</span>
         </div>
-        <div className="text-rose-200/60 font-semibold tracking-[0.2em]">
+        <div className="text-[#702C43] font-semibold tracking-[0.2em]">
           DESTINATION // {recipientFullName.toUpperCase()}
         </div>
         <div>
-          <span>{timestamp || "LIVE // ARCHIVE"}</span>
+          <span>{timestamp || "LIVE ARCHIVE"}</span>
         </div>
       </div>
 
-      {/* Main hero typography & centerpiece */}
+      {/* Main Headline Centerpiece */}
       <div className="relative z-10 max-w-3xl my-auto flex flex-col items-center">
-        {/* Subtle pill badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-rose-500/20 bg-rose-950/20 text-[11px] font-mono tracking-widest text-rose-300 uppercase mb-6">
-          <Sparkles size={12} className="text-rose-400" />
-          <span>A World Made For Alura</span>
+        {/* Soft Badge with Pink Lily */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#D58C9C]/40 bg-white shadow-sm text-xs font-mono tracking-widest text-[#702C43] uppercase mb-6">
+          <PinkLily size={16} />
+          <span>Alura&apos;s Little Lily World</span>
         </div>
 
-        {/* Cinematic headline */}
-        <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl font-normal text-white tracking-tight mb-6 leading-[1.1]">
-          A World Made
+        <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl font-normal text-[#702C43] tracking-tight mb-4 leading-[1.15]">
+          A Little World,
           <br />
-          <span className="italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-rose-200 via-rose-300 to-white">
-            Just For You.
+          <span className="italic font-normal text-[#A94F65]">
+            Made Just For You.
           </span>
         </h1>
 
-        <p className="text-base sm:text-xl text-rose-100/80 font-light max-w-xl mx-auto mb-4 leading-relaxed">
-          &ldquo;You&apos;re still someone very special to me.&rdquo;
+        <p className="text-base sm:text-xl text-[#702C43]/90 font-light max-w-xl mx-auto mb-3 leading-relaxed">
+          &ldquo;A place filled with the little things I love about you, our memories, and everything I still want to keep building with you.&rdquo;
         </p>
 
-        <p className="text-xs sm:text-sm text-rose-300/50 max-w-md mx-auto font-light leading-relaxed mb-8">
-          I don&apos;t think I ever told you enough how beautiful you are to me. Even with time passing, this little world remains yours.
+        <p className="text-xs sm:text-sm text-[#A94F65] max-w-md mx-auto font-light leading-relaxed mb-6">
+          Nostalgic scrapbook pages, your favorite pink lilies, and our constellation of memories.
         </p>
 
-        {/* Small delicate floating portrait */}
-        <div className="relative w-28 sm:w-36 aspect-[4/5] rounded-xl overflow-hidden p-1.5 bg-gradient-to-b from-rose-500/30 to-black border border-rose-400/30 shadow-[0_10px_25px_rgba(255,77,141,0.25)] transition-transform duration-500 hover:scale-105">
-          <div className="relative w-full h-full rounded-lg overflow-hidden bg-black">
-            <Image
-              src={ghisccaPhoto}
-              alt="Portrait of Alura"
-              fill
-              className="object-cover"
-              sizes="150px"
-              priority
-            />
+        {/* Small delicate floating polaroid preview */}
+        <div className="relative w-32 sm:w-36 -rotate-2 hover:rotate-0 transition-transform duration-300">
+          <div className="washi-tape top-[-8px] left-1/2 -translate-x-1/2 w-20" />
+          <div className="polaroid-frame w-full rounded">
+            <div className="relative w-full aspect-square rounded-sm overflow-hidden bg-[#FCE8E8]">
+              <Image
+                src={ghisccaPhoto}
+                alt="Portrait of Alura"
+                fill
+                className="object-cover"
+                sizes="150px"
+                priority
+              />
+            </div>
+            <p className="font-serif italic text-[10px] text-[#702C43]/80 pt-2 text-center">
+              my favorite person
+            </p>
           </div>
         </div>
       </div>
 
       {/* Scroll indicator */}
-      <div className="relative z-10 flex flex-col items-center gap-2 text-[10px] font-mono tracking-widest text-rose-300/40 uppercase animate-bounce pt-4">
-        <span>EXPLORE HER WORLD</span>
-        <ArrowDown size={14} className="text-rose-400/70" />
+      <div className="relative z-10 flex flex-col items-center gap-1.5 text-[10px] font-mono tracking-widest text-[#A94F65] uppercase animate-bounce pt-4">
+        <span>EXPLORE ALURA&apos;S WORLD</span>
+        <ArrowDown size={14} className="text-[#A94F65]" />
       </div>
     </header>
   );
 }
-
