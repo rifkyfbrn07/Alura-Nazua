@@ -127,6 +127,22 @@ export default function PersonalizedEnding() {
         }
       );
 
+      gsap.fromTo(
+        ".ending-lily",
+        { scale: 0.2, opacity: 0, rotation: -20 },
+        {
+          scale: 1,
+          opacity: 1,
+          rotation: 0,
+          duration: reducedMotion ? 0.2 : 1.4,
+          ease: "elastic.out(1, 0.6)",
+          scrollTrigger: {
+            trigger: ".ending-photo",
+            start: "top 75%",
+          },
+        }
+      );
+
       finalScene.lines.forEach((_, index) => {
         gsap.fromTo(
           `.ending-line-${index}`,
@@ -177,8 +193,8 @@ export default function PersonalizedEnding() {
           </div>
 
           {/* Signature Pink Lily Accent */}
-          <div className="absolute -bottom-5 -right-5 pointer-events-none">
-            <PinkLily size={60} />
+          <div className="ending-lily absolute -bottom-5 -right-5 pointer-events-none">
+            <PinkLily size={64} />
           </div>
         </div>
 

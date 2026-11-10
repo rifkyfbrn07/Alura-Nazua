@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Sparkles, Heart, X, Coffee, Utensils, Cookie, Flame } from "lucide-react";
 import PinkLily from "@/components/pink-lily";
 import { favoriteThings, type FavoriteThing } from "@/lib/love-story";
+import { playPopSound, playPaperSound } from "@/lib/sound-effects";
 
 export default function LittleThings() {
   const [activeItem, setActiveItem] = useState<FavoriteThing | null>(null);
@@ -31,14 +32,18 @@ export default function LittleThings() {
           return (
             <div
               key={item.id}
-              onClick={() => setActiveItem(item)}
-              className="group relative bg-white rounded-2xl p-5 border border-[#F4D1D5] shadow-[0_8px_20px_rgba(112,44,67,0.06)] cursor-pointer transition-all duration-300 hover:shadow-[0_14px_30px_rgba(112,44,67,0.14)] hover:scale-105"
+              onClick={() => {
+                playPopSound();
+                setActiveItem(item);
+              }}
+              className="group relative bg-white rounded-2xl p-5 border border-[#F4D1D5] shadow-[0_8px_20px_rgba(112,44,67,0.06)] cursor-pointer transition-all duration-300 hover:shadow-[0_14px_30px_rgba(112,44,67,0.14)] hover:scale-105 active:scale-95"
               style={{ transform: `rotate(${rotation})` }}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
+                  playPopSound();
                   setActiveItem(item);
                 }
               }}

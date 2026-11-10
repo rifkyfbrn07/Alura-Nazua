@@ -1,20 +1,28 @@
 import type { StaticImageData } from "next/image";
-import ghisccaPortrait from "@/image/Ghiscca.jpeg";
-import blondePortrait from "@/image/blonde.jpeg";
-import couplePhoto from "@/image/berdua.jpeg";
-import smilePortrait from "@/image/simanis.jpeg";
-import blackAndWhitePhoto from "@/image/B&W.jpeg";
-import closePortrait from "@/image/mybini.jpeg";
-import candidPortrait from "@/image/cantik.jpeg";
-import favoritePortrait from "@/image/Lura.jpeg";
-import sittingPortrait from "@/image/mbg.jpeg";
-import gentlePortrait from "@/image/mbgg.jpeg";
-import smilingPortrait from "@/image/Nazua.jpeg";
-import sleepcallPhoto from "@/image/slipkol.jpeg";
-import cutePortrait from "@/image/masi imut.jpeg";
-import greetingPortrait from "@/image/hii.jpeg";
-import recentMemory from "@/image/WhatsApp Image 2026-10-12 at 09.27.07.jpeg";
-import candidLook from "@/image/lurah.jpeg";
+
+// Individual photographs of Alura — ONLY photographs where Alura is wearing her hijab
+import cantikPortrait from "@/image/cantik.jpeg";      // Alura in dusty rose / blush pink hijab (4-frame selfie)
+import simanisPortrait from "@/image/simanis.jpeg";    // Alura in navy blue hijab with clear glasses hanging
+import mybiniPortrait from "@/image/mybini.jpeg";      // Alura in navy blue hijab with "G" necklace, warm close smile
+import masiImutPortrait from "@/image/masi imut.jpeg"; // Alura in soft blush pink hijab (4-frame selfie)
+import hiiPortrait from "@/image/hii.jpeg";            // Alura in black hijab with glasses, playful cute poses
+
+// Couple photographs of Rifky and Alura together (prioritizing authentic photobooth & recent moments)
+import coupleNightPhoto from "@/image/berdua.jpeg";                              // Close night selfie together
+import coupleSweetPhoto from "@/image/WhatsApp Image 2026-11-10 at 09.33.29.jpeg";       // Close sweet selfie together
+import coupleWarmPhoto from "@/image/WhatsApp Image 2026-11-10 at 09.33.29 (1).jpeg";   // Smiling warmly together
+import couplePlayfulPhoto from "@/image/WhatsApp Image 2026-11-10 at 09.33.29 (2).jpeg"; // Playful close selfie
+import coupleCafeTablet1 from "@/image/WhatsApp Image 2026-11-10 at 09.33.27 (1).jpeg";  // Tablet café selfie (playful faces)
+import coupleCafeTablet2 from "@/image/WhatsApp Image 2026-11-10 at 09.33.27 (2).jpeg";  // Tablet café selfie angle 2
+import coupleCafeTablet3 from "@/image/WhatsApp Image 2026-11-10 at 09.33.27.jpeg";      // Tablet café selfie
+import coupleCafeGaze from "@/image/WhatsApp Image 2026-11-10 at 09.33.28.jpeg";         // Rifky & Alura smiling at café table
+
+// Lab Box Photobooth strips (Rifky & Alura with matching bucket hats, gingham border, cute stickers)
+import labBoxStripFull from "@/image/WhatsApp Image 2026-11-10 at 09.33.24.jpeg";        // Lab Box print held in hand
+import labBoxStripScreen from "@/image/WhatsApp Image 2026-11-10 at 09.33.24 (1).jpeg";   // Lab Box live booth screen
+import labBoxStripWide from "@/image/WhatsApp Image 2026-11-10 at 09.33.24 (2).jpeg";     // Lab Box photobooth full view
+
+// Webcam Toy cute couple selfies (Alura in light grey hijab)
 import webcam1 from "@/image/webcam-toy-photo1.jpg";
 import webcam2 from "@/image/webcam-toy-photo2.jpg";
 import webcam3 from "@/image/webcam-toy-photo3.jpg";
@@ -32,17 +40,18 @@ export const preloaderSteps = [
   "A little world made just for you.",
 ];
 
+// Phase 2: Welcome Screen (using Alura's hijab portrait: cantikPortrait)
 export const welcomeScreen = {
   greeting: "Hey, Alura.",
   lead: "I made a little world for you.",
   description:
     "A place filled with the little things I love about you, our memories, and everything I still want to keep building with you.",
   buttonText: "Enter my little world",
-  featuredPhoto: ghisccaPortrait,
+  featuredPhoto: cantikPortrait,
   photoCaption: "The smile that always brightens my day",
 };
 
-// Memory Constellation Orbit Items (preserves the 3D orbit concept with enhanced Polaroid visuals)
+// Section 5: Memory Constellation Orbit Items (Strictly couple photos & Alura in hijab)
 export type OrbitMemory = {
   id: string;
   image: StaticImageData;
@@ -56,75 +65,148 @@ export type OrbitMemory = {
 export const orbitMemories: OrbitMemory[] = [
   {
     id: "orbit-1",
-    image: couplePhoto,
+    image: coupleSweetPhoto,
     caption: "right beside you",
-    alt: "Alura and Rifky together",
+    alt: "Alura and Rifky close selfie together",
     note: "My favorite place in the world is right here, with your hand in mine.",
     date: "A special frame",
     tapeColor: "#F4D1D5",
   },
   {
     id: "orbit-2",
-    image: ghisccaPortrait,
-    caption: "that gentle light",
-    alt: "Soft smiling portrait of Alura",
+    image: cantikPortrait,
+    caption: "that gentle radiance",
+    alt: "Alura smiling in her blush pink hijab",
     note: "I love the way your eyes crinkle when you're genuinely smiling.",
-    date: "Just you",
+    date: "Soft afternoon",
     tapeColor: "#E8B5C0",
   },
   {
     id: "orbit-3",
-    image: blondePortrait,
-    caption: "silly photo strips",
-    alt: "Playful photo strip of Alura",
-    note: "Every little version of you, laughter and goofy poses included.",
-    date: "Photo booth day",
+    image: coupleCafeTablet1,
+    caption: "little café laughter",
+    alt: "Rifky and Alura taking tablet selfies at the café",
+    note: "Every little silly face and spontaneous moment with you is a treasure.",
+    date: "Café date",
     tapeColor: "#D58C9C",
   },
   {
     id: "orbit-4",
-    image: smilePortrait,
+    image: simanisPortrait,
     caption: "the sweetest smile",
-    alt: "Warm smiling portrait of Alura",
+    alt: "Warm smiling portrait of Alura in navy hijab",
     note: "The smile that makes every ordinary day feel warm and meaningful.",
     date: "Pure joy",
     tapeColor: "#F4D1D5",
   },
   {
     id: "orbit-5",
-    image: candidPortrait,
-    caption: "simply beautiful",
-    alt: "Candid portrait of Alura",
-    note: "Completely natural, unposed, and effortlessly glowing.",
-    date: "Candid afternoon",
+    image: coupleWarmPhoto,
+    caption: "warmth in every glance",
+    alt: "Rifky and Alura smiling softly together",
+    note: "Finding peace and happiness in the quiet moments we share.",
+    date: "Together",
     tapeColor: "#E8B5C0",
   },
   {
     id: "orbit-6",
-    image: blackAndWhitePhoto,
-    caption: "frozen in time",
-    alt: "Black and white memory of Alura",
-    note: "Proof that warmth and love never lose their color.",
-    date: "Timeless moment",
+    image: mybiniPortrait,
+    caption: "simply beautiful",
+    alt: "Close portrait of Alura with letter G necklace in navy hijab",
+    note: "Completely natural, sweet, and effortlessly glowing.",
+    date: "Favorite portrait",
     tapeColor: "#D58C9C",
   },
   {
     id: "orbit-7",
-    image: sittingPortrait,
-    caption: "a quiet afternoon",
-    alt: "Alura at a quiet table",
-    note: "Sitting across from you, wishing the afternoon would never end.",
-    date: "Cozy café",
+    image: coupleNightPhoto,
+    caption: "under the quiet night",
+    alt: "Rifky and Alura smiling together at night",
+    note: "Sitting close to you, wishing the evening would never end.",
+    date: "Night breeze",
     tapeColor: "#F4D1D5",
   },
   {
     id: "orbit-8",
-    image: sleepcallPhoto,
-    caption: "in between the hours",
-    alt: "Sleepcall night moment",
-    note: "Whispering through the screen until sleep gently took over.",
-    date: "Late night whispers",
+    image: masiImutPortrait,
+    caption: "playful innocence",
+    alt: "Alura in soft pink hijab smiling cutely",
+    note: "Your sweet laughter that always brings warmth into my heart.",
+    date: "Sweet smiles",
     tapeColor: "#E8B5C0",
+  },
+  {
+    id: "orbit-9",
+    image: couplePlayfulPhoto,
+    caption: "laughing together",
+    alt: "Rifky and Alura playful close selfie",
+    note: "Because life is so much brighter when we're smiling side by side.",
+    date: "Happy hours",
+    tapeColor: "#F4D1D5",
+  },
+  {
+    id: "orbit-10",
+    image: hiiPortrait,
+    caption: "cute little quirks",
+    alt: "Alura in black hijab with glasses making cute poses",
+    note: "All the little quirks and expressions that make you uniquely you.",
+    date: "Quirky takes",
+    tapeColor: "#D58C9C",
+  },
+];
+
+// Section: OUR LITTLE TOYBOX — Interactive Photobooth Strips
+export type PhotoboothStrip = {
+  id: string;
+  title: string;
+  caption: string;
+  sticker: string;
+  image: StaticImageData;
+  rotation: number;
+  ribbonColor: string;
+  note: string;
+};
+
+export const toyboxPhotoboothStrips: PhotoboothStrip[] = [
+  {
+    id: "strip-1",
+    title: "Lab Box Photobooth",
+    caption: "my favorite little moments.",
+    sticker: "🎀",
+    image: labBoxStripFull,
+    rotation: -3,
+    ribbonColor: "#F4D1D5",
+    note: "The photobooth strip with matching bucket hats, gingham border, and the biggest smiles.",
+  },
+  {
+    id: "strip-2",
+    title: "Matching Hats & Hugs",
+    caption: "we look cute together, don't we?",
+    sticker: "⭐",
+    image: labBoxStripScreen,
+    rotation: 2.5,
+    ribbonColor: "#E8B5C0",
+    note: "Looking at the screen while holding our printed strip, laughing at every pose.",
+  },
+  {
+    id: "strip-3",
+    title: "Café Table Memories",
+    caption: "one strip, so many memories.",
+    sticker: "🌷",
+    image: coupleCafeTablet2,
+    rotation: -1.5,
+    ribbonColor: "#D58C9C",
+    note: "Sitting across from each other, capturing selfies through the screen on a sunny afternoon.",
+  },
+  {
+    id: "strip-4",
+    title: "Endless Smiles",
+    caption: "I'd keep these moments forever.",
+    sticker: "💫",
+    image: coupleCafeGaze,
+    rotation: 3.5,
+    ribbonColor: "#F4D1D5",
+    note: "The quiet look in your eyes that always tells me everything will be okay.",
   },
 ];
 
@@ -229,7 +311,7 @@ export const favoriteThings: FavoriteThing[] = [
   },
 ];
 
-// Section 7: Nostalgic Scrapbook Moments
+// Section 7: Nostalgic Scrapbook Moments (Strictly couple photos & Alura in hijab)
 export type ScrapbookMoment = {
   id: string;
   image: StaticImageData;
@@ -244,7 +326,7 @@ export type ScrapbookMoment = {
 export const scrapbookMoments: ScrapbookMoment[] = [
   {
     id: "moment-1",
-    image: couplePhoto,
+    image: coupleSweetPhoto,
     title: "Side by Side",
     caption: "The world feels so quiet and safe whenever I'm holding your hand.",
     date: "One frame, both of us",
@@ -254,27 +336,27 @@ export const scrapbookMoments: ScrapbookMoment[] = [
   },
   {
     id: "moment-2",
-    image: candidPortrait,
-    title: "Completely You",
+    image: cantikPortrait,
+    title: "Her Sweet Radiance",
     caption: "Looking back at this, I'm reminded how easy it is to adore everything about you.",
-    date: "Candid sunshine",
+    date: "Blush pink warmth",
     tapeRotation: 3,
     rotation: 2,
     tag: "ALURA // MEMORY_02",
   },
   {
     id: "moment-3",
-    image: blondePortrait,
-    title: "Laughter in Four Takes",
-    caption: "The spontaneous goofy faces in the photo booth that make me laugh every time.",
-    date: "Photo booth day",
+    image: coupleCafeTablet1,
+    title: "Café Afternoon",
+    caption: "Spontaneous silly faces in front of the screen that make me smile every time.",
+    date: "Café date",
     tapeRotation: -2,
     rotation: -2.5,
     tag: "SMILES // MEMORY_03",
   },
   {
     id: "moment-4",
-    image: favoritePortrait,
+    image: mybiniPortrait,
     title: "A Favorite View",
     caption: "I could look at this picture a hundred times and still stop to admire you.",
     date: "My favorite view",
@@ -284,18 +366,18 @@ export const scrapbookMoments: ScrapbookMoment[] = [
   },
   {
     id: "moment-5",
-    image: recentMemory,
-    title: "Our Story Continues",
+    image: coupleWarmPhoto,
+    title: "Finding Our Way Forward",
     caption: "Growing alongside you, learning to understand and love each other better every day.",
-    date: "October days",
+    date: "Together",
     tapeRotation: -3,
     rotation: -1,
     tag: "JOURNEY // MEMORY_05",
   },
   {
     id: "moment-6",
-    image: smilePortrait,
-    title: "Sweet Light",
+    image: masiImutPortrait,
+    title: "Pure Joy",
     caption: "Your warmth is like a quiet shelter on days that feel overwhelming.",
     date: "Quiet joy",
     tapeRotation: 4,
@@ -304,7 +386,7 @@ export const scrapbookMoments: ScrapbookMoment[] = [
   },
 ];
 
-// Film Strip Webcam Snaps for authentic scrapbook collage
+// Film Strip Webcam Snaps for authentic scrapbook collage (Alura in light grey hijab)
 export const filmstripSnaps = [webcam1, webcam2, webcam3, webcam4];
 
 // Section 9: A Little Promise
@@ -332,6 +414,9 @@ export const foundationLetter = [
   "Rifky",
 ];
 
+// Envelope Polaroid Photo (tucked inside letter)
+export const letterEnvelopePhoto = coupleSweetPhoto;
+
 // Section 11: Final Scene
 export const finalScene = {
   lines: [
@@ -342,5 +427,5 @@ export const finalScene = {
   ],
   dedication: "For you, Alura.",
   signature: "With love, Rifky.",
-  photo: couplePhoto,
+  photo: coupleWarmPhoto,
 };

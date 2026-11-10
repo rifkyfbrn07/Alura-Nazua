@@ -119,6 +119,60 @@ body {
   }
 }
 
+@keyframes wingLeft {
+  0% {
+    transform: scaleX(1) rotate(0deg);
+  }
+  100% {
+    transform: scaleX(0.2) rotate(-20deg);
+  }
+}
+
+@keyframes wingRight {
+  0% {
+    transform: scaleX(1) rotate(0deg);
+  }
+  100% {
+    transform: scaleX(0.2) rotate(20deg);
+  }
+}
+
+@keyframes lilySway {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes ribbonSway {
+  0%, 100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  50% {
+    transform: rotate(4deg) translateY(-2px);
+  }
+}
+
+@keyframes heartbeatPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  15% {
+    transform: scale(1.12);
+  }
+  30% {
+    transform: scale(1.02);
+  }
+  45% {
+    transform: scale(1.18);
+  }
+  70% {
+    transform: scale(1);
+  }
+}
+
 /* Custom Scrollbar in Romantic Rose */
 ::-webkit-scrollbar {
   width: 7px;

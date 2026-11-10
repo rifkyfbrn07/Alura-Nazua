@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Heart } from "lucide-react";
 import PinkLily from "@/components/pink-lily";
 import { scrapbookMoments, filmstripSnaps } from "@/lib/love-story";
+import { playPaperSound } from "@/lib/sound-effects";
 
 export default function MemoryGallery() {
   return (
@@ -48,7 +49,8 @@ export default function MemoryGallery() {
         {scrapbookMoments.map((moment, index) => (
           <article
             key={moment.id}
-            className="relative flex flex-col items-center transition-transform duration-300 hover:scale-[1.03] hover:z-20"
+            onPointerDown={() => playPaperSound()}
+            className="group relative flex flex-col items-center cursor-pointer transition-all duration-300 hover:scale-[1.04] hover:-translate-y-2 hover:z-20 active:scale-98"
             style={{ transform: `rotate(${moment.rotation}deg)` }}
           >
             {/* Washi tape at top */}

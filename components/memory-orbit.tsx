@@ -6,6 +6,7 @@ import { X, Sparkles, RotateCw, ArrowLeft } from "lucide-react";
 import gsap from "gsap";
 import PinkLily from "@/components/pink-lily";
 import { orbitMemories, type OrbitMemory, recipientName } from "@/lib/love-story";
+import { playHeartbeatSound, playPaperSound } from "@/lib/sound-effects";
 
 type Particle = {
   x: number;
@@ -304,6 +305,7 @@ export default function MemoryOrbit() {
 
   // Heart Tap: Ripple, petal burst, photos push outward
   const handleHeartClick = () => {
+    playHeartbeatSound();
     const canvas = canvasRef.current;
     if (!canvas) return;
     const centerX = canvas.width * 0.5;
@@ -348,6 +350,7 @@ export default function MemoryOrbit() {
 
   const handlePhotoClick = (photo: OrbitMemory) => {
     if (dragRef.current.moved) return;
+    playPaperSound();
     setActivePhoto(photo);
   };
 

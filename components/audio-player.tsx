@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardRef } from "react";
-import { Play, Pause } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX } from "lucide-react";
 import PinkLily from "@/components/pink-lily";
+import { isSfxEnabled, toggleSfx } from "@/lib/sound-effects";
 
 export type AudioPlayerHandle = {
   play: () => Promise<void>;
@@ -27,6 +28,13 @@ export const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
 
     const [isPlaying, setIsPlaying] = useState(false);
     const [autoplayBlocked, setAutoplayBlocked] = useState(false);
+    const [sfxActive, setSfxActive] = useState(true);
+
+    const handleToggleSfx = useCallback((e: React.MouseEvent) => {
+      e.stopPropagation();
+      const nextState = toggleSfx();
+      setSfxActive(nextState);
+    }, []);
 
     // Setup Web Audio Analyser for music reactivity
     const setupAudioContext = useCallback(() => {
@@ -180,6 +188,22 @@ export const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
           role="region"
           aria-label="Sound player"
         >
+          {/* SFX Mute/Unmute Toggle */}
+          <button
+            type="button"
+            onClick={handleToggleSfx}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border border-[#E8B5C0] bg-white/80 backdrop-blur-md text-[#702C43] text-[11px] font-mono shadow-sm hover:bg-white hover:border-[#D58C9C] active:scale-95 transition-all"
+            title={sfxActive ? "Mute sound effects" : "Unmute sound effects"}
+            aria-label={sfxActive ? "Mute sound effects" : "Unmute sound effects"}
+          >
+            {sfxActive ? (
+              <Volume2 size={13} className="text-[#A94F65]" />
+            ) : (
+              <VolumeX size={13} className="text-[#702C43]/50" />
+            )}
+            <span className="hidden sm:inline text-[10px]">SFX</span>
+          </button>
+
           <button
             type="button"
             onClick={togglePlay}

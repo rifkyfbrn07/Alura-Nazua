@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import gsap from "gsap";
-import { X, Sparkles } from "lucide-react";
+import { X, Sparkles, Heart } from "lucide-react";
 import PinkLily from "@/components/pink-lily";
-import { foundationLetter, recipientName } from "@/lib/love-story";
+import { foundationLetter, recipientName, letterEnvelopePhoto } from "@/lib/love-story";
+import { playPaperSound, playSparkleSound } from "@/lib/sound-effects";
 
 export default function InteractiveLetter() {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,6 +16,7 @@ export default function InteractiveLetter() {
 
   const handleOpenLetter = () => {
     if (isOpen || isAnimating) return;
+    playPaperSound();
     setIsAnimating(true);
     setHasCracked(true);
 
@@ -27,6 +30,7 @@ export default function InteractiveLetter() {
 
     const tl = gsap.timeline({
       onComplete: () => {
+        playSparkleSound();
         setIsOpen(true);
         setIsAnimating(false);
       },
@@ -240,6 +244,25 @@ export default function InteractiveLetter() {
                   </p>
                 );
               })}
+            </div>
+
+            {/* Keepsake Couple Polaroid Pinned to the Letter */}
+            <div className="mt-8 pt-6 border-t border-[#F4D1D5]/60 flex flex-col items-center">
+              <div className="relative p-2.5 pb-4 bg-[#FFF7F5] rounded-xl border border-[#E8B5C0] shadow-md -rotate-1 hover:rotate-0 transition-transform max-w-[220px]">
+                <div className="washi-tape top-[-7px] left-1/2 -translate-x-1/2 w-16 bg-[#F4D1D5]" />
+                <div className="relative aspect-[4/5] rounded overflow-hidden mb-2">
+                  <Image
+                    src={letterEnvelopePhoto}
+                    alt="Rifky and Alura together"
+                    fill
+                    sizes="220px"
+                    className="object-cover"
+                  />
+                </div>
+                <p className="font-serif italic text-[11px] text-[#702C43]/80 text-center">
+                  Forever kept in my heart
+                </p>
+              </div>
             </div>
 
             {/* Footer */}

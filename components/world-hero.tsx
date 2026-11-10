@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Sparkles, ArrowDown } from "lucide-react";
 import PinkLily from "@/components/pink-lily";
 import { recipientFullName, recipientName, creatorName } from "@/lib/love-story";
-import ghisccaPhoto from "@/image/Ghiscca.jpeg";
+import mybiniPhoto from "@/image/mybini.jpeg";
 
 export default function WorldHero() {
   const [timestamp, setTimestamp] = useState<string>("");
@@ -77,8 +77,8 @@ export default function WorldHero() {
           <div className="polaroid-frame w-full rounded">
             <div className="relative w-full aspect-square rounded-sm overflow-hidden bg-[#FCE8E8]">
               <Image
-                src={ghisccaPhoto}
-                alt="Portrait of Alura"
+                src={mybiniPhoto}
+                alt="Portrait of Alura smiling"
                 fill
                 className="object-cover"
                 sizes="150px"

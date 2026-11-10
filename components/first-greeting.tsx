@@ -3,9 +3,10 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, Heart } from "lucide-react";
 import PinkLily from "@/components/pink-lily";
 import { welcomeScreen, recipientName } from "@/lib/love-story";
+import { playPaperSound, playPopSound } from "@/lib/sound-effects";
 
 type FirstGreetingProps = {
   onEnter: () => void;
@@ -54,6 +55,7 @@ export default function FirstGreeting({ onEnter }: FirstGreetingProps) {
   }, []);
 
   const handleEnterClick = () => {
+    playPopSound();
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const container = containerRef.current;
     if (!container) {

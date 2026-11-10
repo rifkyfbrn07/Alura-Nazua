@@ -11,11 +11,13 @@ import FirstGreeting from "@/components/first-greeting";
 import WorldHero from "@/components/world-hero";
 import MemoryOrbit from "@/components/memory-orbit";
 import LittleThings from "@/components/little-things";
+import LittleToybox from "@/components/little-toybox";
 import MemoryGallery from "@/components/memory-gallery";
 import RelationshipTimeline from "@/components/relationship-timeline";
 import LittlePromise from "@/components/little-promise";
 import InteractiveLetter from "@/components/interactive-letter";
 import PersonalizedEnding from "@/components/personalized-ending";
+import CuteButterflies from "@/components/cute-butterflies";
 
 type ExperiencePhase = "preloader" | "greeting" | "world";
 
@@ -83,6 +85,9 @@ export default function LoveExperience() {
       {/* Phase 3: The Full Lily World */}
       {phase === "world" && (
         <div className="relative z-10 w-full animate-[fadeIn_0.8s_ease-out]">
+          {/* Subtle Fluttering Butterflies across the page */}
+          <CuteButterflies />
+
           {/* Scrapbook Cover & Hero */}
           <WorldHero />
 
@@ -91,6 +96,9 @@ export default function LoveExperience() {
 
           {/* Section 6: The Little Things I Love About You (Alura's favorites) */}
           <LittleThings />
+
+          {/* Section: OUR LITTLE TOYBOX (Interactive Photobooth Keepsakes) */}
+          <LittleToybox />
 
           {/* Section 7: Our Little Moments (Scrapbook Polaroids & Filmstrip) */}
           <MemoryGallery />
