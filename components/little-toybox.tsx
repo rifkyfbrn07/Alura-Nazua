@@ -50,6 +50,7 @@ export default function LittleToybox() {
 
   return (
     <section
+      id="memory-toybox"
       ref={containerRef}
       className="relative py-24 sm:py-32 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto select-none overflow-hidden"
       aria-label="Our Little Toybox"
@@ -262,4 +263,3 @@ export default function LittleToybox() {
     </section>
   );
 }
-

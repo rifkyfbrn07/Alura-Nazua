@@ -208,7 +208,7 @@ export default function AluraGarden() {
   }, []);
 
   return (
-    <section className="relative py-24 sm:py-32 px-4 sm:px-6 md:px-8 max-w-6xl mx-auto select-none overflow-hidden">
+    <section id="lily-garden" className="relative py-24 sm:py-32 px-4 sm:px-6 md:px-8 max-w-6xl mx-auto select-none overflow-hidden">
       {/* Chapter Label */}
       <div className="relative text-center max-w-xl mx-auto mb-10">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/95 border border-[#E8B5C0] shadow-sm mb-4">
@@ -474,4 +474,3 @@ export default function AluraGarden() {
     </section>
   );
 }
-

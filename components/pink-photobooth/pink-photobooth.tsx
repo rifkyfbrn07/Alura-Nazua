@@ -205,8 +205,14 @@ export default function PinkPhotobooth() {
     if (!video) return null;
 
     const snapCanvas = document.createElement("canvas");
-    snapCanvas.width = 960;
-    snapCanvas.height = 720;
+    // Preserve the dimensions supplied by the active camera. Forcing 4:3 here
+    // stretched 16:9 and portrait streams before they reached the photo slots.
+    const sourceWidth = video.videoWidth || 1280;
+    const sourceHeight = video.videoHeight || 960;
+    const captureWidth = Math.min(sourceWidth, 1600);
+    const captureHeight = Math.round(captureWidth * (sourceHeight / sourceWidth));
+    snapCanvas.width = captureWidth;
+    snapCanvas.height = captureHeight;
     const ctx = snapCanvas.getContext("2d");
     if (!ctx) return null;
 
@@ -619,7 +625,7 @@ export default function PinkPhotobooth() {
               </div>
 
               {/* Camera Toggles: Timer, Mirror, Grid, Switch */}
-              <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end">
                 {/* Timer Toggle */}
                 <button
                   type="button"
@@ -681,6 +687,16 @@ export default function PinkPhotobooth() {
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
                 </button>
+                {cameraActive && (
+                  <button
+                    type="button"
+                    onClick={stopCamera}
+                    className="p-2 rounded-xl bg-white text-[#702C43] border border-[#F4D1D5] hover:bg-[#FFF0F2] transition-colors text-xs"
+                    title="Stop Camera"
+                  >
+                    Stop Camera
+                  </button>
+                )}
               </div>
             </div>
 
@@ -707,7 +723,7 @@ export default function PinkPhotobooth() {
                   </div>
                   <h3 className="font-serif text-lg text-[#702C43] font-medium">Camera is Standing By</h3>
                   <p className="text-xs text-[#702C43]/70 max-w-xs mt-1 mb-4">
-                    Press Start Camera to allow preview and take your photos.
+                    {cameraError ? "Camera access needs attention. Check permission or availability, then retry." : "Press Start Camera when you’re ready to preview and take your photos."}
                   </p>
                   {cameraError && (
                     <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs mb-3 max-w-sm">

@@ -251,3 +251,449 @@ body {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Lili's small world is interactive only while its map or room is open. */
+.lili-companion {
+  position: fixed;
+  z-index: 60;
+  right: max(14px, env(safe-area-inset-right));
+  bottom: max(14px, env(safe-area-inset-bottom));
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+}
+
+.lili-friend {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  width: 92px;
+  min-height: 100px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.lili-friend svg {
+  width: 86px;
+  height: 101px;
+  overflow: visible;
+  filter: drop-shadow(0 5px 8px rgba(112, 44, 67, .2));
+  transform-origin: 50% 90%;
+}
+
+.lili-name {
+  margin-top: -7px;
+  padding: 2px 9px;
+  border: 1px solid #f4d1d5;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .94);
+  color: #702c43;
+  font: 600 10px/1.5 system-ui, sans-serif;
+  box-shadow: 0 2px 8px rgba(112, 44, 67, .12);
+}
+
+.lili-speech {
+  max-width: 180px;
+  padding: 7px 10px;
+  border: 1px solid rgba(232, 181, 192, .8);
+  border-radius: 14px 14px 3px 14px;
+  background: rgba(255, 255, 255, .96);
+  color: #702c43;
+  font-size: 11px;
+  line-height: 1.35;
+  text-align: center;
+  box-shadow: 0 5px 18px rgba(112, 44, 67, .12);
+}
+
+.lili-wave svg { animation: lili-wave 1.15s ease-in-out infinite; }
+.lili-happy svg, .lili-laugh svg { animation: lili-bob .55s ease-in-out 2; }
+.lili-run svg { animation: lili-run .3s ease-in-out infinite alternate; }
+.lili-dance svg { animation: lili-dance .8s ease-in-out infinite; }
+.lili-grumpy .lili-eye { transform: scaleY(.55); transform-origin: center; }
+.lili-grumpy .lili-smile { d: path("M51 88q5 -4 10 0"); }
+.lili-sleepy .lili-eye { transform: scaleY(.2); transform-origin: center; }
+.lili-sleepy svg { animation: lili-sleep 2.4s ease-in-out infinite; }
+.lili-compact { width: 74px; min-height: 78px; }
+.lili-compact svg { width: 68px; height: 78px; }
+.lili-compact .lili-name { display: none; }
+
+.lili-world-backdrop {
+  position: fixed;
+  z-index: 90;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  background: rgba(73, 35, 48, .48);
+  backdrop-filter: blur(7px);
+  animation: fadeIn .2s ease-out;
+}
+
+.lili-world-dialog {
+  width: min(940px, 100%);
+  max-height: min(900px, 92dvh);
+  overflow: auto;
+  border: 1px solid #f0cbd2;
+  border-radius: 28px;
+  background: #fffaf9;
+  color: #702c43;
+  box-shadow: 0 25px 90px rgba(64, 25, 39, .3);
+  animation: scaleIn .24s cubic-bezier(.2, .8, .2, 1);
+  overscroll-behavior: contain;
+}
+
+.lili-world-header {
+  position: sticky;
+  z-index: 5;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid #f5dfe2;
+  background: rgba(255, 250, 249, .96);
+  backdrop-filter: blur(10px);
+}
+
+.lili-world-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #a94f65;
+  font: 600 9px/1.5 ui-monospace, monospace;
+  letter-spacing: .16em;
+}
+
+.lili-world-header h2 {
+  margin: 3px 0 0;
+  color: #702c43;
+  font: 500 clamp(20px, 4vw, 29px)/1.2 Georgia, serif;
+}
+
+.lili-icon-button, .lili-back-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 42px;
+  min-height: 42px;
+  border: 1px solid #e8b5c0;
+  border-radius: 50%;
+  background: #fff;
+  color: #702c43;
+  cursor: pointer;
+}
+
+.lili-back-button { min-width: auto; padding: 7px 12px; border-radius: 999px; font-size: 12px; }
+.lili-icon-button:hover, .lili-back-button:hover { background: #fff0f2; }
+
+.lili-map { padding: 14px 20px 8px; }
+.lili-map-illustration {
+  position: relative;
+  display: grid;
+  grid-template: repeat(3, minmax(112px, 1fr)) / repeat(3, minmax(0, 1fr));
+  grid-template-areas: "room garden moon" "photo center toy" "bakery photo2 toy";
+  gap: 12px;
+  min-height: 410px;
+  padding: 8px;
+  overflow: hidden;
+  border: 1px solid #f2d8d8;
+  border-radius: 22px;
+  background:
+    radial-gradient(ellipse at 18% 20%, rgba(196, 221, 175, .48), transparent 25%),
+    radial-gradient(ellipse at 83% 78%, rgba(255, 211, 191, .45), transparent 28%),
+    linear-gradient(140deg, #f8f2dc, #edf2d7 44%, #f9e5e3);
+}
+
+.map-path {
+  position: absolute;
+  inset: 20% 20%;
+  border: 2px dashed rgba(169, 79, 101, .2);
+  border-radius: 45%;
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+
+.map-center {
+  z-index: 1;
+  display: grid;
+  grid-area: center;
+  place-items: center;
+  border: 1px dashed rgba(169, 79, 101, .24);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .48);
+}
+
+.map-place {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, .9);
+  border-radius: 17px;
+  background: rgba(255, 255, 255, .86);
+  color: #702c43;
+  text-align: left;
+  box-shadow: 0 6px 16px rgba(112, 44, 67, .1);
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.map-place:hover, .map-place:focus-visible {
+  transform: translateY(-3px) rotate(-1deg);
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(112, 44, 67, .17);
+}
+
+.place-room { grid-area: room; }
+.place-garden { grid-area: garden; }
+.place-moonlight { grid-area: moon; }
+.place-photobooth { grid-area: photo; }
+.place-toybox { grid-area: toy; }
+.place-bakery { grid-area: bakery; }
+.map-place-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 12px; background: #fff0f2; color: #a94f65; }
+.place-green .map-place-icon { background: #edf4e6; color: #5d8155; }
+.place-lilac .map-place-icon { background: #f0eafa; color: #806b9a; }
+.place-peach .map-place-icon { background: #fff0e8; color: #bb755c; }
+.place-night .map-place-icon { background: #eeeafa; color: #625e94; }
+.map-place-name { font: 600 13px/1.2 Georgia, serif; }
+.map-place-detail { color: #946475; font-size: 10px; line-height: 1.3; }
+
+.map-rare-lily {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border: 1px dashed #d58c9c;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .82);
+  color: #a94f65;
+  cursor: pointer;
+}
+.map-rare-lily span { color: #ce7992; font-size: 16px; filter: hue-rotate(25deg); }
+.map-rare-lily small { font-size: 9px; }
+.lili-map-footer, .lili-world-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 4px 3px; color: #916375; font-size: 11px; }
+.lili-map-footer span, .lili-world-footer span { display: inline-flex; align-items: center; gap: 5px; }
+.lili-map-footer button { border: 0; background: transparent; color: #a94f65; text-decoration: underline; cursor: pointer; font-size: 11px; }
+.lili-world-footer { padding: 12px 22px 15px; border-top: 1px solid #f5dfe2; }
+.lili-world-footer span:last-child { color: #a94f65; }
+
+.lili-room { padding: 14px 20px 18px; }
+.lili-room-topline { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; color: #a94f65; font-size: 11px; }
+.lili-cozy-room {
+  position: relative;
+  min-height: 480px;
+  overflow: hidden;
+  border: 1px solid #f3d9d4;
+  border-radius: 21px;
+  background: linear-gradient(180deg, #f9e8e5 0 64%, #d8b8a8 64% 100%);
+}
+.room-wall {
+  position: relative;
+  min-height: 480px;
+  background: linear-gradient(90deg, transparent 0 10%, rgba(255,255,255,.15) 10.2% 10.5%, transparent 10.7% 89%, rgba(255,255,255,.15) 89.2% 89.5%, transparent 89.7%);
+}
+.room-window {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  z-index: 2;
+  width: min(290px, 46%);
+  min-height: 142px;
+  overflow: hidden;
+  border: 9px solid #fff9f4;
+  border-radius: 13px 13px 5px 5px;
+  box-shadow: 0 4px 10px rgba(112, 44, 67, .13);
+  transform: translateX(-50%);
+}
+
+.room-object {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 72px;
+  min-height: 55px;
+  padding: 7px 9px;
+  border: 1px solid rgba(169, 79, 101, .2);
+  border-radius: 13px;
+  background: rgba(255, 250, 249, .94);
+  color: #702c43;
+  box-shadow: 0 5px 12px rgba(112, 44, 67, .12);
+  cursor: pointer;
+  font: 600 11px/1.2 Georgia, serif;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.room-object:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(112, 44, 67, .16); }
+.room-object small { color: #9c6c7a; font: 9px/1.2 system-ui, sans-serif; }
+.room-bed { left: 5%; bottom: 62px; width: 30%; height: 95px; background: linear-gradient(180deg, #fff 0 18%, #e8b5c0 18% 100%); }
+.room-desk { left: 41%; bottom: 58px; width: 24%; height: 70px; }
+.room-mirror { right: 7%; top: 44%; min-width: 76px; min-height: 83px; border-radius: 50% 50% 13px 13px; }
+.room-wardrobe { right: 4%; bottom: 63px; width: 16%; height: 135px; background: #e8c6b6; }
+.room-books { left: 8%; top: 23%; }
+.room-photos { left: 28%; top: 26%; }
+.room-lamp { right: 25%; top: 33%; }
+.room-lamp.lamp-on { background: #fff5cd; box-shadow: 0 0 34px rgba(255, 221, 127, .75); }
+.room-drawer { left: 45%; top: 48%; }
+.room-door { right: 20%; bottom: 57px; background: #d3a99b; }
+.room-rug { position: absolute; bottom: 5px; left: 28%; width: 48%; height: 44px; border: 5px double rgba(169,79,101,.22); border-radius: 50%; background: #f5d9d8; }
+.room-polaroid { position: absolute; z-index: 4; top: 31%; left: 44%; display: grid; gap: 4px; width: 74px; padding: 5px 5px 8px; border: 0; background: white; color: #8d5c6e; box-shadow: 0 3px 9px rgba(112,44,67,.2); transform: rotate(-7deg); touch-action: none; cursor: grab; font: 9px Georgia, serif; }
+.room-polaroid:active { cursor: grabbing; }
+.polaroid-snapshot { display: grid; place-items: center; height: 56px; background: linear-gradient(135deg,#f8d1d6,#f8ece0); color: #a94f65; font-size: 24px; }
+.lili-window-view, .little-window-view { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 124px; padding: 8px; text-align: center; }
+.window-scene { position: relative; display: grid; place-items: center; width: 100%; height: 76px; overflow: hidden; border-radius: 6px; background: linear-gradient(#bfe0ef,#edf2d9); color: #fff7cc; }
+.window-scene svg { width: 30px; height: 30px; fill: #fff1bd; stroke: #ffe4a0; }
+.window-sunset .window-scene { background: linear-gradient(#f3b3aa,#f8d5b1 70%,#dfb5a6); }
+.window-night .window-scene { background: linear-gradient(#282c54,#57547a); }
+.window-night .window-scene svg { fill: #fff4cf; }
+.window-bloom, .window-butterfly, .window-bird, .window-stars { position: absolute; color: #a94f65; font-size: 16px; }
+.window-bloom { bottom: 3px; left: 12%; }
+.window-butterfly { top: 18px; right: 18%; }
+.window-bird { top: 16px; left: 30%; color: #865c68; }
+.window-stars { top: 5px; left: 12%; color: #fff3c8; font-size: 13px; }
+.lili-discovery { position: absolute; z-index: 6; bottom: 52px; left: 50%; display: flex; align-items: center; gap: 8px; width: max-content; max-width: calc(100% - 24px); padding: 10px 13px; border: 1px solid #e8b5c0; border-radius: 13px; background: #fff; color: #702c43; box-shadow: 0 8px 25px rgba(112,44,67,.16); transform: translateX(-50%); font-size: 11px; }
+.lili-discovery button { padding: 4px 7px; border: 0; border-radius: 8px; background: #fff0f2; color: #a94f65; white-space: nowrap; cursor: pointer; font-size: 10px; }
+.lili-room-hint { position: absolute; right: 12px; bottom: 12px; display: flex; align-items: center; gap: 4px; margin: 0; padding: 5px 8px; border-radius: 999px; background: rgba(255,255,255,.76); color: #875a68; font-size: 9px; }
+.room-delights { position: absolute; z-index: 5; top: 12px; right: 10px; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px; width: 44%; }
+.room-delights button { min-height: 32px; padding: 5px 8px; border: 1px solid rgba(232,181,192,.8); border-radius: 999px; background: rgba(255,255,255,.88); color: #8e5265; cursor: pointer; font-size: 9px; }
+.room-balloon::before { content: "●"; display: inline-block; margin-right: 5px; color: #e789a1; animation: balloon-bob 1.6s ease-in-out infinite; }
+.room-balloon.balloon-popped::before { content: "♡"; animation: balloon-pop .35s ease-out; }
+.room-dandelion::before { content: "✿"; display: inline-block; margin-right: 4px; color: #d9b678; }
+.room-dandelion.dandelion-blown::before { content: "✧"; animation: sparkle-out .6s ease-out; }
+.room-butterfly::before { content: "⌁"; margin-right: 5px; color: #aa81be; }
+.room-butterfly.butterfly-away::before { animation: butterfly-fly .9s ease-in forwards; }
+.room-delights .gift-opened { background: #fff0f2; }
+
+.lili-bakery { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; padding: 4px 2px; }
+.bakery-display { grid-row: span 5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: 260px; padding: 24px; border: 1px solid #f0d7d1; border-radius: 20px; background: radial-gradient(circle at 50% 42%, #fff 0 22%, transparent 23%), linear-gradient(145deg,#fff1ed,#f8d5d7); text-align: center; }
+.bakery-display strong { font: 600 21px Georgia,serif; color: #702c43; }
+.bakery-display > span:last-child { max-width: 290px; color: #906174; font-size: 12px; }
+.bakery-dessert { display: grid; place-items: center; width: 82px; height: 82px; border: 3px solid #fff; border-radius: 50%; background: #edb2be; color: #fff; font-size: 35px; box-shadow: 0 5px 18px rgba(112,44,67,.14); }
+.dessert-served .bakery-dessert { animation: lili-bob .5s ease-in-out 2; }
+.lili-bakery h3 { margin: 0; font: 600 14px Georgia,serif; }
+.lili-select-label { color: #8e5e6d; font-size: 11px; }
+.lili-bakery select { width: 100%; min-height: 40px; padding: 8px 10px; border: 1px solid #e8b5c0; border-radius: 10px; background: white; color: #702c43; }
+.bakery-ingredients { display: flex; flex-wrap: wrap; gap: 7px; }
+.ingredient { min-height: 36px; padding: 7px 10px; border: 1px solid #e8b5c0; border-radius: 999px; background: white; color: #875769; cursor: pointer; font-size: 11px; }
+.ingredient.chosen { background: #fff0f2; border-color: #d58c9c; color: #702c43; }
+.bakery-last-step { display: grid; grid-template-columns: 1fr 1.2fr; align-items: end; gap: 8px; }
+.bakery-last-step label { grid-column: 1 / -1; }
+.lili-primary-button { min-height: 40px; padding: 8px 14px; border: 0; border-radius: 999px; background: #a94f65; color: #fff; cursor: pointer; }
+.lili-bakery-hint { grid-column: 2; color: #a0737f; font-size: 10px; }
+
+.lili-moonlight { position: relative; overflow: hidden; padding: 25px; border: 1px solid #8e81ae; border-radius: 20px; background: linear-gradient(160deg,#292644,#524566 62%,#8c667d); color: #fff8f4; }
+.moonlight-sky { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.moonlight-sky span { position: absolute; color: #ffe9be; animation: star-twinkle 2.6s ease-in-out infinite alternate; }
+.moonlight-sky span:nth-child(1) { top: 12%; left: 17%; }
+.moonlight-sky span:nth-child(2) { top: 24%; right: 18%; animation-delay: .4s; }
+.moonlight-sky span:nth-child(3) { top: 58%; left: 8%; animation-delay: .9s; }
+.moonlight-sky span:nth-child(4) { bottom: 13%; right: 9%; animation-delay: 1.2s; }
+.moonlight-sky span:nth-child(5) { bottom: 17%; left: 28%; animation-delay: .6s; }
+.moonlight-player { position: relative; z-index: 1; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 15px; max-width: 540px; margin: 0 auto; padding: 18px; border: 1px solid rgba(255,255,255,.25); border-radius: 17px; background: rgba(255,255,255,.12); backdrop-filter: blur(10px); }
+.cassette-art { display: grid; place-items: center; width: 95px; height: 76px; border: 4px solid #f5d5d8; border-radius: 10px; background: linear-gradient(140deg,#f2b8c5,#fff0eb); color: #a94f65; text-align: center; box-shadow: 0 5px 14px rgba(0,0,0,.18); }
+.cassette-art span { font-size: 20px; }
+.cassette-art small { font: 8px/1.1 ui-monospace,monospace; text-transform: uppercase; }
+.moonlight-track > span { color: #f1c6d0; font: 9px ui-monospace,monospace; letter-spacing: .18em; }
+.moonlight-track h3 { margin: 4px 0 9px; font: italic 22px Georgia,serif; }
+.music-visualizer { display: flex; align-items: center; gap: 4px; height: 24px; }
+.music-visualizer i { width: 4px; height: 5px; border-radius: 4px; background: #ffc9d4; }
+.is-playing .music-visualizer i { animation: soundbar .65s ease-in-out infinite alternate; }
+.music-visualizer i:nth-child(2n) { animation-delay: .2s; }
+.music-visualizer i:nth-child(3n) { animation-delay: .35s; }
+.moonlight-controls { display: flex; gap: 8px; }
+.lili-play-button { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: #fff2f4; color: #702c43; cursor: pointer; }
+.moonlight-player .lili-icon-button { width: 40px; min-width: 40px; min-height: 40px; border-color: rgba(255,255,255,.45); background: rgba(255,255,255,.13); color: white; }
+.moonlight-progress { grid-column: 1 / -1; width: 100%; accent-color: #f5bdca; }
+.moonlight-times { grid-column: 1 / -1; display: flex; justify-content: space-between; margin-top: -12px; color: #ead4dc; font: 9px ui-monospace,monospace; }
+.moonlight-note { position: relative; z-index: 1; margin: 16px 0 7px; text-align: center; font: italic 14px Georgia,serif; }
+.lili-moonlight .lili-room-hint { position: relative; right: auto; bottom: auto; justify-content: center; margin: 8px auto 0; background: rgba(255,255,255,.14); color: #fff4f3; }
+
+@keyframes lili-wave { 0%,100% { transform: rotate(0) translateY(0); } 25% { transform: rotate(-8deg) translateY(-4px); } 60% { transform: rotate(7deg) translateY(-2px); } }
+@keyframes lili-bob { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-9px) scale(1.03); } }
+@keyframes lili-run { from { transform: translateX(-4px) rotate(-5deg); } to { transform: translateX(4px) rotate(5deg); } }
+@keyframes lili-dance { 0%,100% { transform: rotate(-7deg) translateY(0); } 50% { transform: rotate(7deg) translateY(-5px); } }
+@keyframes lili-sleep { 0%,100% { transform: rotate(1deg); } 50% { transform: rotate(-3deg) translateY(3px); } }
+@keyframes balloon-bob { 50% { transform: translateY(-5px); } }
+@keyframes balloon-pop { 50% { transform: scale(1.8); opacity: 0; } }
+@keyframes sparkle-out { to { transform: translate(10px,-10px) scale(1.5); opacity: 0; } }
+@keyframes butterfly-fly { to { transform: translate(45px,-50px) rotate(25deg); opacity: 0; } }
+@keyframes star-twinkle { from { opacity: .35; transform: scale(.8); } to { opacity: 1; transform: scale(1.12); } }
+
+.page-hidden .lili-companion *, .page-hidden .moonlight-sky span, .page-hidden .is-playing .music-visualizer i { animation-play-state: paused !important; }
+
+@media (max-width: 680px) {
+  .lili-companion { right: 8px; bottom: max(8px, env(safe-area-inset-bottom)); }
+  .lili-friend { width: 76px; min-height: 82px; }
+  .lili-friend svg { width: 71px; height: 83px; }
+  .lili-speech { max-width: 155px; font-size: 10px; }
+  .lili-world-backdrop { padding: 7px; }
+  .lili-world-dialog { max-height: 94dvh; border-radius: 20px; }
+  .lili-world-header { padding: 13px 15px 11px; }
+  .lili-map { padding: 9px 10px 5px; }
+  .lili-map-illustration { grid-template: repeat(3, minmax(97px, 1fr)) / repeat(2, minmax(0, 1fr)); grid-template-areas: "room garden" "center moon" "photo toy" "bakery bakery"; min-height: auto; gap: 8px; padding: 7px 7px 42px; }
+  .map-center { min-height: 88px; }
+  .map-place { padding: 8px; border-radius: 13px; }
+  .map-place-icon { width: 29px; height: 29px; }
+  .map-place-name { font-size: 11px; }
+  .map-place-detail { font-size: 9px; }
+  .map-path { inset: 15% 13%; }
+  .map-rare-lily { right: 7px; bottom: 5px; }
+  .lili-map-footer { padding: 9px 2px; font-size: 10px; }
+  .lili-room { padding: 9px; }
+  .lili-room-topline { align-items: flex-start; font-size: 9px; }
+  .lili-cozy-room { min-height: 475px; }
+  .room-wall { min-height: 475px; }
+  .room-window { width: 44%; min-height: 123px; border-width: 6px; }
+  .room-object { min-width: 58px; min-height: 48px; padding: 5px; font-size: 9px; }
+  .room-object small { font-size: 8px; }
+  .room-bed { left: 3%; bottom: 62px; width: 31%; height: 83px; }
+  .room-desk { left: 36%; bottom: 58px; width: 25%; height: 58px; }
+  .room-wardrobe { right: 2%; bottom: 62px; width: 17%; height: 118px; }
+  .room-door { right: 19%; bottom: 57px; }
+  .room-mirror { right: 3%; top: 43%; min-width: 60px; min-height: 69px; }
+  .room-books { left: 3%; top: 23%; }
+  .room-photos { left: 25%; top: 25%; }
+  .room-lamp { right: 25%; top: 32%; }
+  .room-drawer { left: 39%; top: 47%; }
+  .room-polaroid { left: 40%; top: 30%; width: 64px; }
+  .room-delights { top: 8px; right: 7px; width: 46%; gap: 3px; }
+  .room-delights button { min-height: 29px; padding: 4px 6px; font-size: 8px; }
+  .lili-discovery { bottom: 48px; flex-wrap: wrap; justify-content: center; font-size: 10px; }
+  .lili-room-hint { right: 5px; bottom: 5px; font-size: 8px; }
+  .lili-bakery { grid-template-columns: 1fr; gap: 10px; }
+  .bakery-display { grid-row: auto; min-height: 150px; padding: 14px; }
+  .bakery-dessert { width: 60px; height: 60px; font-size: 27px; }
+  .lili-bakery-hint { grid-column: auto; }
+  .lili-moonlight { padding: 14px 10px; }
+  .moonlight-player { grid-template-columns: 66px 1fr; gap: 10px; padding: 11px; }
+  .cassette-art { width: 64px; height: 60px; border-width: 3px; }
+  .cassette-art small { font-size: 7px; }
+  .moonlight-track h3 { font-size: 18px; }
+  .moonlight-controls { grid-column: 1 / -1; justify-content: center; }
+  .moonlight-progress, .moonlight-times { grid-column: 1 / -1; }
+  .lili-world-footer { padding: 10px 13px; font-size: 9px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lili-companion *, .lili-world-dialog *, .room-delights *, .moonlight-sky span {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}

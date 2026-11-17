@@ -7,6 +7,7 @@ import gsap from "gsap";
 import PinkLily from "@/components/pink-lily";
 import { orbitMemories, type OrbitMemory, recipientName } from "@/lib/love-story";
 import { playHeartbeatSound, playPaperSound } from "@/lib/sound-effects";
+import { useModalLifecycle } from "@/lib/use-modal-lifecycle";
 
 type Particle = {
   x: number;
@@ -51,6 +52,11 @@ export default function MemoryOrbit() {
 
   const [activePhoto, setActivePhoto] = useState<OrbitMemory | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [isOrbitVisible, setIsOrbitVisible] = useState(false);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const closePhoto = useCallback(() => setActivePhoto(null), []);
+
+  useModalLifecycle(Boolean(activePhoto), closePhoto, dialogRef);
 
   const particlesRef = useRef<Particle[]>([]);
   const burstPetalsRef = useRef<BurstPetal[]>([]);
@@ -69,7 +75,7 @@ export default function MemoryOrbit() {
   // Pause heavy canvas and 3D calculations when offscreen
   useEffect(() => {
     const world = worldRef.current;
-    if (!world || typeof IntersectionObserver === "undefined") return;
+    if (!world) return;
 
     const updateDims = () => {
       const rect = world.getBoundingClientRect();
@@ -78,10 +84,26 @@ export default function MemoryOrbit() {
     updateDims();
     window.addEventListener("resize", updateDims, { passive: true });
 
+    const updateVisibility = () => {
+      setIsOrbitVisible(isVisibleRef.current && !document.hidden);
+    };
+    const handleVisibility = () => updateVisibility();
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    if (typeof IntersectionObserver === "undefined") {
+      isVisibleRef.current = true;
+      updateVisibility();
+      return () => {
+        window.removeEventListener("resize", updateDims);
+        document.removeEventListener("visibilitychange", handleVisibility);
+      };
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           isVisibleRef.current = entry.isIntersecting;
+          updateVisibility();
         });
       },
       { rootMargin: "150px" }
@@ -90,12 +112,14 @@ export default function MemoryOrbit() {
     observer.observe(world);
     return () => {
       window.removeEventListener("resize", updateDims);
+      document.removeEventListener("visibilitychange", handleVisibility);
       observer.disconnect();
     };
   }, []);
 
   // 1. Central Particle Heart & Canvas Effects
   useEffect(() => {
+    if (!isOrbitVisible) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -146,14 +170,9 @@ export default function MemoryOrbit() {
     };
 
     initHeartParticles();
-    let animId: number;
+    let animId = 0;
 
     const render = (time: number) => {
-      if (!isVisibleRef.current) {
-        animId = requestAnimationFrame(render);
-        return;
-      }
-
       ctx.clearRect(0, 0, width, height);
       const centerX = width * 0.5;
       const centerY = height * 0.5;
@@ -241,33 +260,29 @@ export default function MemoryOrbit() {
         ctx.restore();
       }
 
-      animId = requestAnimationFrame(render);
+      if (!reducedMotion) animId = requestAnimationFrame(render);
     };
 
-    animId = requestAnimationFrame(render);
+    if (reducedMotion) render(0);
+    else animId = requestAnimationFrame(render);
 
     return () => {
       window.removeEventListener("resize", handleResize);
       cancelAnimationFrame(animId);
     };
-  }, []);
+  }, [isOrbitVisible, reducedMotion]);
 
   // 2. 3D Multi-Layer Orbit Layout Loop
   useEffect(() => {
     const world = worldRef.current;
-    if (!world) return;
+    if (!world || !isOrbitVisible) return;
 
     const cards = Array.from(world.querySelectorAll<HTMLElement>(".orbit-polaroid-item"));
     let animId: number;
 
     const tick = () => {
-      if (!isVisibleRef.current) {
-        animId = requestAnimationFrame(tick);
-        return;
-      }
-
       // Natural orbit rotation if not dragging and not zoomed into a photo
-      if (!dragRef.current.isDragging && !activePhoto) {
+      if (!reducedMotion && !dragRef.current.isDragging && !activePhoto) {
         angleRef.current += velocityRef.current;
       }
 
@@ -308,13 +323,13 @@ export default function MemoryOrbit() {
         card.style.zIndex = `${zIndex}`;
       });
 
-      animId = requestAnimationFrame(tick);
+      if (!reducedMotion) animId = requestAnimationFrame(tick);
     };
 
-    animId = requestAnimationFrame(tick);
+    tick();
 
     return () => cancelAnimationFrame(animId);
-  }, [activePhoto]);
+  }, [activePhoto, isOrbitVisible, reducedMotion]);
 
   // Pointer drag controls (Mouse, Touch, Stylus)
   const handlePointerDown = (e: React.PointerEvent) => {
@@ -391,7 +406,7 @@ export default function MemoryOrbit() {
   };
 
   return (
-    <section className="relative w-full py-16 sm:py-24 overflow-hidden select-none bg-gradient-to-b from-[#FFF7F5] via-[#FCE8E8]/40 to-[#FFF7F5]">
+    <section id="memory-constellation" className="relative w-full py-16 sm:py-24 overflow-hidden select-none bg-gradient-to-b from-[#FFF7F5] via-[#FCE8E8]/40 to-[#FFF7F5]">
       {/* Decorative Corner Lilies */}
       <div className="absolute top-10 left-6 opacity-40 pointer-events-none hidden md:block">
         <PinkLily size={80} />
@@ -491,14 +506,18 @@ export default function MemoryOrbit() {
           className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-[#FFF7F5]/90 backdrop-blur-md animate-[fadeIn_0.3s_ease-out]"
           role="dialog"
           aria-modal="true"
+          aria-label={`Memory: ${activePhoto.caption}`}
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closePhoto();
+          }}
         >
-          <div className="relative w-full max-w-sm sm:max-w-md bg-white border border-[#F4D1D5] rounded-2xl p-6 shadow-[0_20px_50px_rgba(112,44,67,0.18)] flex flex-col items-center text-center">
+          <div ref={dialogRef} tabIndex={-1} className="relative w-full max-w-sm sm:max-w-md bg-white border border-[#F4D1D5] rounded-2xl p-6 shadow-[0_20px_50px_rgba(112,44,67,0.18)] flex flex-col items-center text-center">
             {/* Top Washi Tape */}
             <div className="washi-tape top-[-10px] left-1/2 -translate-x-1/2 w-28" />
 
             <button
               type="button"
-              onClick={() => setActivePhoto(null)}
+              onClick={closePhoto}
               className="absolute top-4 right-4 p-2 rounded-full bg-[#FFF7F5] hover:bg-[#FCE8E8] text-[#702C43] transition-colors"
               aria-label="Back to orbit"
             >
@@ -528,7 +547,7 @@ export default function MemoryOrbit() {
 
             <button
               type="button"
-              onClick={() => setActivePhoto(null)}
+              onClick={closePhoto}
               className="inline-flex items-center gap-2 px-6 py-2 rounded-full border border-[#D58C9C] bg-[#FCE8E8] hover:bg-[#F4D1D5] text-[#702C43] text-xs font-mono tracking-wider uppercase transition-colors"
             >
               <ArrowLeft size={14} />

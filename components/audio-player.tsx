@@ -8,12 +8,15 @@ import { isSfxEnabled, toggleSfx } from "@/lib/sound-effects";
 const TRACKS = [
   { id: "shape-of-my-heart", title: "Shape of My Heart", src: "/audio/Shape-of-My-Heart.mp3" },
   { id: "dinda", title: "Dinda", src: "/audio/dinda.mp3" },
+  { id: "jatuh-suka", title: "Jatuh Suka", src: "/audio/Jatuh%20Suka.mp3" },
 ];
 
 export type AudioPlayerHandle = {
   play: () => Promise<void>;
   pause: () => void;
   toggle: () => void;
+  playTrack: (trackId: string) => Promise<void>;
+  getAudioElement: () => HTMLAudioElement | null;
   getEnergy: () => number;
   isPlaying: boolean;
 };
@@ -134,6 +137,21 @@ export const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
       }
     }, [setupAudioContext]);
 
+    const playTrack = useCallback(async (trackId: string) => {
+      const nextIndex = TRACKS.findIndex((track) => track.id === trackId);
+      if (nextIndex < 0) {
+        throw new Error(`Unknown music track: ${trackId}`);
+      }
+      const audio = audioRef.current;
+      if (!audio) return;
+      setTrackIndex(nextIndex);
+      if (!audio.src.endsWith(encodeURI(TRACKS[nextIndex].src.slice(1)))) {
+        audio.src = TRACKS[nextIndex].src;
+        audio.load();
+      }
+      await playAudio();
+    }, [playAudio]);
+
     const pauseAudio = useCallback(() => {
       const audio = audioRef.current;
       if (!audio) return;
@@ -155,15 +173,17 @@ export const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
         play: playAudio,
         pause: pauseAudio,
         toggle: togglePlay,
+        playTrack,
+        getAudioElement: () => audioRef.current,
         getEnergy: () => energyRef.current,
         isPlaying,
       }),
-      [playAudio, pauseAudio, togglePlay, isPlaying]
+      [playAudio, pauseAudio, togglePlay, playTrack, isPlaying]
     );
 
     useEffect(() => {
       const audio = audioRef.current;
-      if (!audio) return;
+      if (!audio || !autoPlayAttempt) return;
 
       const handleCanPlay = () => {
         if (autoPlayAttempt) {

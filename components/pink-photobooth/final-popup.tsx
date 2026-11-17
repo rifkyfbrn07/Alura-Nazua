@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Download, Sparkles, Edit3, Camera, X, Layers, Check } from "lucide-react";
 import { playPopSound, playSparkleSound, playChimeWin } from "@/lib/sound-effects";
+import { useModalLifecycle } from "@/lib/use-modal-lifecycle";
 
 type FinalPopupProps = {
   isOpen: boolean;
@@ -27,6 +28,9 @@ export default function FinalPopup({
 }: FinalPopupProps) {
   const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [downloadingIndividual, setDownloadingIndividual] = useState(false);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+
+  useModalLifecycle(isOpen && Boolean(compiledImageUrl), onClose, dialogRef);
 
   if (!isOpen || !compiledImageUrl) return null;
 
@@ -65,10 +69,20 @@ export default function FinalPopup({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-black/75 backdrop-blur-md transition-opacity duration-300">
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-black/75 backdrop-blur-md transition-opacity duration-300"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
       <div
+        ref={dialogRef}
         className="relative w-full max-w-2xl bg-[#FFFBFB] rounded-3xl border border-[#F4D1D5] shadow-2xl p-5 sm:p-8 flex flex-col items-center animate-in fade-in zoom-in-95 duration-300 my-auto"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="photobooth-popup-title"
+        tabIndex={-1}
       >
         {/* Close Button Top Right */}
         <button
@@ -89,7 +103,7 @@ export default function FinalPopup({
             <Sparkles className="w-3.5 h-3.5 text-[#D58C9C]" />
             <span>Freshly Printed Photobox Memory</span>
           </div>
-          <h2 className="font-serif text-2xl sm:text-3xl text-[#702C43] font-medium tracking-tight">
+          <h2 id="photobooth-popup-title" className="font-serif text-2xl sm:text-3xl text-[#702C43] font-medium tracking-tight">
             Your Little Photobooth Memory!
           </h2>
           <p className="font-sans text-xs sm:text-sm text-[#702C43]/75 mt-1 font-light italic">
@@ -180,4 +194,3 @@ export default function FinalPopup({
     </div>
   );
 }
-

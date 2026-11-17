@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Sparkles, Camera, Heart, RotateCcw, X, Stamp } from "lucide-react";
 import PinkLily from "@/components/pink-lily";
 import { HiddenLilyTrigger } from "@/components/hidden-lilies-manager";
 import { gacoanPhotoboothStrips, type GacoanPhotoboothStrip } from "@/lib/love-story";
-import { playCameraShutter, playPaperSound, playPopSound } from "@/lib/sound-effects";
+import { playCameraShutter, playPaperSound } from "@/lib/sound-effects";
+import { useModalLifecycle } from "@/lib/use-modal-lifecycle";
 
 export default function GacoanPhotobooth() {
   const [selectedStrip, setSelectedStrip] = useState<GacoanPhotoboothStrip | null>(null);
@@ -15,9 +16,21 @@ export default function GacoanPhotobooth() {
   const [showCaption, setShowCaption] = useState(false);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const timersRef = useRef<number[]>([]);
+
+  useEffect(() => () => {
+    timersRef.current.forEach((timer) => window.clearTimeout(timer));
+  }, []);
+
+  const clearTimers = useCallback(() => {
+    timersRef.current.forEach((timer) => window.clearTimeout(timer));
+    timersRef.current = [];
+  }, []);
 
   // Handle clicking / tapping a photobooth strip
   const handleOpenStrip = useCallback((strip: GacoanPhotoboothStrip) => {
+    clearTimers();
     playPaperSound();
     setSelectedStrip(strip);
     setIsLifting(true);
@@ -25,24 +38,27 @@ export default function GacoanPhotobooth() {
     setFlashActive(false);
 
     // Sequence: lift -> film camera flash -> freshly printed reveal
-    setTimeout(() => {
+    timersRef.current.push(window.setTimeout(() => {
       setFlashActive(true);
       playCameraShutter();
-      setTimeout(() => {
+      timersRef.current.push(window.setTimeout(() => {
         setFlashActive(false);
         setShowCaption(true);
-      }, 350);
-    }, 400);
-  }, []);
+      }, 350));
+    }, 400));
+  }, [clearTimers]);
 
   const handleCloseStrip = useCallback(() => {
     playPaperSound();
     setShowCaption(false);
     setIsLifting(false);
-    setTimeout(() => {
+    clearTimers();
+    timersRef.current.push(window.setTimeout(() => {
       setSelectedStrip(null);
-    }, 380);
-  }, []);
+    }, 380));
+  }, [clearTimers]);
+
+  useModalLifecycle(Boolean(selectedStrip), handleCloseStrip, dialogRef);
 
   return (
     <section
@@ -101,7 +117,7 @@ export default function GacoanPhotobooth() {
 
           {/* Grid of Photobooth Strips */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 items-end justify-center py-3">
-            {gacoanPhotoboothStrips.map((strip, idx) => {
+            {gacoanPhotoboothStrips.map((strip) => {
               return (
                 <div
                   key={strip.id}
@@ -109,7 +125,13 @@ export default function GacoanPhotobooth() {
                   style={{
                     transform: `rotate(${strip.rotation}deg)`,
                   }}
-                  onPointerDown={() => handleOpenStrip(strip)}
+                  onClick={() => handleOpenStrip(strip)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      handleOpenStrip(strip);
+                    }
+                  }}
                   role="button"
                   tabIndex={0}
                   aria-label={`View photobooth strip: ${strip.title}`}
@@ -172,6 +194,9 @@ export default function GacoanPhotobooth() {
           role="dialog"
           aria-modal="true"
           aria-label={selectedStrip.title}
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) handleCloseStrip();
+          }}
         >
           {/* Subtle Film-Camera Flash Animation */}
           {flashActive && (
@@ -183,9 +208,11 @@ export default function GacoanPhotobooth() {
 
           {/* The Zoomed Photobooth Strip */}
           <div
+            ref={dialogRef}
             className={`relative max-w-md w-full bg-white rounded-2xl shadow-[0_25px_70px_rgba(112,44,67,0.4)] border-4 border-[#FCE8E8] p-4 sm:p-6 transition-all duration-500 transform ${
               isLifting ? "scale-100 opacity-100 translate-y-0" : "scale-90 opacity-0 translate-y-10"
             }`}
+            tabIndex={-1}
           >
             {/* Close Button */}
             <button
@@ -252,4 +279,3 @@ export default function GacoanPhotobooth() {
     </section>
   );
 }
-

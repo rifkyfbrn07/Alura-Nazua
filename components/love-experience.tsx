@@ -107,6 +107,10 @@ const SurpriseVisitor = dynamic(() => import("@/components/surprise-visitor"), {
   ssr: false,
 });
 
+const LiliWorld = dynamic(() => import("@/components/lili-world"), {
+  ssr: false,
+});
+
 type ExperiencePhase = "preloader" | "greeting" | "world";
 
 export default function LoveExperience() {
@@ -158,7 +162,7 @@ export default function LoveExperience() {
   return (
     <main className="relative min-h-screen bg-[#FFF7F5] text-[#702C43] selection:bg-[#F4D1D5] selection:text-[#702C43]">
       {/* Persistent Audio Manager */}
-      <AudioPlayer ref={audioPlayerRef} autoPlayAttempt={true} />
+      <AudioPlayer ref={audioPlayerRef} autoPlayAttempt={false} />
 
       {/* Subtle Romantic Paper Grain Overlay (Hardware accelerated) */}
       <div className="film-grain" aria-hidden="true" />
@@ -176,6 +180,7 @@ export default function LoveExperience() {
       {/* Phase 3: The Full Lily World */}
       {phase === "world" && (
         <div className="relative z-10 w-full animate-[fadeIn_0.6s_ease-out]">
+          <LiliWorld audioPlayer={audioPlayerRef.current} />
           {/* Hardware-accelerated fluttering butterflies */}
           <CuteButterflies />
 

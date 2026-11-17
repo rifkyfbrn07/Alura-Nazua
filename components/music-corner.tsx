@@ -8,6 +8,7 @@ import { playPopSound } from "@/lib/sound-effects";
 export default function MusicCorner() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [trackName, setTrackName] = useState("Shape of My Heart");
+  const [audioError, setAudioError] = useState<string | null>(null);
 
   // Synchronize with document and audio elements if active
   useEffect(() => {
@@ -17,6 +18,8 @@ export default function MusicCorner() {
         setIsPlaying(!audioEl.paused);
         if (audioEl.src.includes("dinda")) {
           setTrackName("Dinda");
+        } else if (audioEl.src.includes("Jatuh%20Suka") || audioEl.src.includes("Jatuh Suka")) {
+          setTrackName("Jatuh Suka");
         } else {
           setTrackName("Shape of My Heart");
         }
@@ -32,7 +35,7 @@ export default function MusicCorner() {
     const audioEl = document.querySelector("audio");
     if (!audioEl) return;
     if (audioEl.paused) {
-      audioEl.play().catch(() => {});
+      audioEl.play().then(() => setAudioError(null)).catch(() => setAudioError("This track could not be played. Try another song."));
       setIsPlaying(true);
     } else {
       audioEl.pause();
@@ -44,15 +47,22 @@ export default function MusicCorner() {
     playPopSound();
     const audioEl = document.querySelector("audio");
     if (!audioEl) return;
-    const isCurrentlyDinda = audioEl.src.includes("dinda");
-    audioEl.src = isCurrentlyDinda ? "/audio/Shape-of-My-Heart.mp3" : "/audio/dinda.mp3";
-    audioEl.play().catch(() => {});
+    const tracks = [
+      { title: "Shape of My Heart", src: "/audio/Shape-of-My-Heart.mp3" },
+      { title: "Dinda", src: "/audio/dinda.mp3" },
+      { title: "Jatuh Suka", src: "/audio/Jatuh%20Suka.mp3" },
+    ];
+    const currentIndex = tracks.findIndex((track) => audioEl.src.includes(track.src.split("/").pop() ?? ""));
+    const nextTrack = tracks[(currentIndex + 1) % tracks.length];
+    audioEl.src = nextTrack.src;
+    audioEl.load();
+    audioEl.play().then(() => setAudioError(null)).catch(() => setAudioError("This track could not be played. Try another song."));
     setIsPlaying(true);
-    setTrackName(isCurrentlyDinda ? "Shape of My Heart" : "Dinda");
+    setTrackName(nextTrack.title);
   }, []);
 
   return (
-    <section className="relative py-20 px-4 sm:px-6 md:px-8 max-w-4xl mx-auto select-none">
+    <section id="moonlight-corner" className="relative py-20 px-4 sm:px-6 md:px-8 max-w-4xl mx-auto select-none">
       {/* Chapter Label */}
       <div className="relative text-center max-w-xl mx-auto mb-10">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/95 border border-[#E8B5C0] shadow-sm mb-4">
@@ -116,6 +126,7 @@ export default function MusicCorner() {
           <h3 className="font-serif italic text-xl text-[#702C43] font-medium mt-0.5 mb-4">
             {trackName}
           </h3>
+          {audioError && <p role="status" className="text-xs text-[#A94F65] mb-3">{audioError}</p>}
 
           <div className="flex items-center justify-center gap-3">
             <button
@@ -142,4 +153,3 @@ export default function MusicCorner() {
     </section>
   );
 }
-

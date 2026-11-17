@@ -8,7 +8,7 @@ import { playPaperSound } from "@/lib/sound-effects";
 
 export default function MemoryGallery() {
   return (
-    <section className="relative w-full py-20 px-4 sm:px-6 md:px-8 max-w-6xl mx-auto select-none">
+    <section id="memory-gallery" className="relative w-full py-20 px-4 sm:px-6 md:px-8 max-w-6xl mx-auto select-none">
       {/* Section Header */}
       <div className="text-center mb-16">
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full border border-[#D58C9C]/40 bg-[#FCE8E8]/70 text-[11px] font-mono tracking-widest text-[#702C43] uppercase mb-3">
