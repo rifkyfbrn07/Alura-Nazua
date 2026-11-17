@@ -66,7 +66,7 @@ import {
 
 export default function PinkPhotobooth() {
   // Current Workflow Step
-  const [currentStep, setCurrentStep] = useState<PhotoboothStep>("camera");
+  const [currentStep, setCurrentStep] = useState<PhotoboothStep>("welcome");
 
   // Camera & Stream States
   const [cameraActive, setCameraActive] = useState(false);
@@ -115,6 +115,7 @@ export default function PinkPhotobooth() {
 
   // Final Output & Modal States
   const [compiledImageUrl, setCompiledImageUrl] = useState<string | null>(null);
+  const [livePreviewUrl, setLivePreviewUrl] = useState<string | null>(null);
   const [isCompiling, setIsCompiling] = useState(false);
   const [isFinalPopupOpen, setIsFinalPopupOpen] = useState(false);
 
@@ -122,9 +123,10 @@ export default function PinkPhotobooth() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const hiddenCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const stickerIdRef = useRef(0);
 
   // ─── CAMERA MANAGEMENT ──────────────────────────────────────────────────────
-  const startCamera = useCallback(async () => {
+  const startCamera = useCallback(async (requestedFacingMode: "user" | "environment" = facingMode) => {
     setCameraError(null);
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -132,13 +134,19 @@ export default function PinkPhotobooth() {
         return;
       }
 
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((t) => t.stop());
+      if (streamRef.current?.getVideoTracks().some((track) => track.readyState === "live")) {
+        const existing = streamRef.current;
+        if (videoRef.current) {
+          videoRef.current.srcObject = existing;
+          await videoRef.current.play();
+        }
+        setCameraActive(true);
+        return;
       }
 
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: { ideal: facingMode },
+          facingMode: { ideal: requestedFacingMode },
           width: { ideal: 1280 },
           height: { ideal: 960 },
         },
@@ -174,12 +182,27 @@ export default function PinkPhotobooth() {
     setCameraActive(false);
   }, []);
 
-  // Cleanup on unmount or when leaving camera/review step
+  // The review screen replaces the camera panel. Reattach the still-live stream
+  // when the camera panel returns so its new video element cannot remain black.
   useEffect(() => {
-    if (currentStep === "editor" || currentStep === "final_popup") {
-      stopCamera();
-    }
-  }, [currentStep, stopCamera]);
+    if (currentStep !== "camera" || !videoRef.current || !streamRef.current) return;
+    videoRef.current.srcObject = streamRef.current;
+    void videoRef.current.play().then(() => setCameraActive(true)).catch(() => {
+      setCameraError("Camera preview paused. Tap Retry Camera to reconnect.");
+      setCameraActive(false);
+    });
+  }, [currentStep]);
+
+  useEffect(() => {
+    const track = streamRef.current?.getVideoTracks()[0];
+    if (!track) return;
+    const onEnded = () => {
+      setCameraActive(false);
+      setCameraError("Camera connection ended. Please retry camera access.");
+    };
+    track.addEventListener("ended", onEnded);
+    return () => track.removeEventListener("ended", onEnded);
+  }, [cameraActive]);
 
   useEffect(() => {
     return () => {
@@ -187,22 +210,18 @@ export default function PinkPhotobooth() {
     };
   }, [stopCamera]);
 
-  // Restart camera when facing mode changes
-  useEffect(() => {
-    if (cameraActive && (currentStep === "camera" || currentStep === "review_single")) {
-      startCamera();
-    }
-  }, [facingMode]); // eslint-disable-line react-hooks/exhaustive-deps
-
   const handleSwitchCamera = useCallback(() => {
     playPopSound();
-    setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
-  }, []);
+    const nextFacingMode = facingMode === "user" ? "environment" : "user";
+    stopCamera();
+    setFacingMode(nextFacingMode);
+    window.setTimeout(() => { void startCamera(nextFacingMode); }, 0);
+  }, [facingMode, startCamera, stopCamera]);
 
   // ─── STEP 2: TAKE ONE PHOTO ─────────────────────────────────────────────────
   const captureOnePhoto = useCallback(() => {
     const video = videoRef.current;
-    if (!video) return null;
+    if (!video || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || video.videoWidth < 1 || video.videoHeight < 1) return null;
 
     const snapCanvas = document.createElement("canvas");
     // Preserve the dimensions supplied by the active camera. Forcing 4:3 here
@@ -223,19 +242,13 @@ export default function PinkPhotobooth() {
       ctx.scale(-1, 1);
     }
 
-    // Apply active filter CSS directly during snapshot
-    const filterCss = getCombinedCssFilter(selectedFilter, adjustments);
-    if (filterCss !== "none") {
-      ctx.filter = filterCss;
-    }
-
     ctx.drawImage(video, 0, 0, snapCanvas.width, snapCanvas.height);
     ctx.restore();
 
     return snapCanvas.toDataURL("image/jpeg", 0.94);
-  }, [mirrorVideo, facingMode, selectedFilter, adjustments]);
+  }, [mirrorVideo, facingMode]);
 
-  const handleTriggerCapture = useCallback(() => {
+  const handleTriggerCapture = useCallback(async () => {
     if (!cameraActive) {
       startCamera();
       return;
@@ -250,6 +263,7 @@ export default function PinkPhotobooth() {
         setTimeout(() => setFlashActive(false), 200);
       }
       playCameraShutter();
+      await waitForVideoFrame(videoRef.current);
       const snap = captureOnePhoto();
       if (snap) {
         setPendingPhoto(snap);
@@ -262,7 +276,7 @@ export default function PinkPhotobooth() {
     let count = timerSeconds;
     setCountdown(count);
 
-    const timerInterval = setInterval(() => {
+    const timerInterval = setInterval(async () => {
       count -= 1;
       if (count > 0) {
         setCountdown(count);
@@ -278,6 +292,7 @@ export default function PinkPhotobooth() {
         }
         playCameraShutter();
 
+        await waitForVideoFrame(videoRef.current);
         const snap = captureOnePhoto();
         if (snap) {
           setPendingPhoto(snap);
@@ -325,14 +340,15 @@ export default function PinkPhotobooth() {
     setPendingPhoto(null);
 
     // If session now has enough photos for layout, jump to editor or tray
-    const currentCount = sessionPhotos.length + 1;
+    const currentCount = retakeTargetIndex !== null ? sessionPhotos.length : sessionPhotos.length + 1;
     if (currentCount >= selectedLayout.requiredPhotos) {
+      stopCamera();
       setCurrentStep("editor");
       playChimeWin();
     } else {
       setCurrentStep("camera");
     }
-  }, [pendingPhoto, retakeTargetIndex, sessionPhotos.length, selectedLayout.requiredPhotos]);
+  }, [pendingPhoto, retakeTargetIndex, sessionPhotos.length, selectedLayout.requiredPhotos, stopCamera]);
 
   // ─── STEP 4: SESSION MANAGEMENT ─────────────────────────────────────────────
   const handleDeletePhoto = useCallback((index: number) => {
@@ -392,6 +408,17 @@ export default function PinkPhotobooth() {
       const sy = (slot.y / 100) * canvasHeight;
       const sw = (slot.w / 100) * canvasWidth;
       const sh = (slot.h / 100) * canvasHeight;
+      const mat = ["maroon-scrapbook", "denim-diary", "mini-gallery"].includes(selectedFrame.accentStyle)
+        ? Math.max(8, Math.round(canvasWidth * 0.012))
+        : 0;
+      const photoX = sx + mat;
+      const photoY = sy + mat;
+      const photoW = sw - mat * 2;
+      const photoH = sh - mat * 2;
+      if (mat) {
+        ctx.fillStyle = selectedFrame.accentStyle === "denim-diary" ? "#F4EBDD" : "#FFFDF8";
+        ctx.fillRect(sx, sy, sw, sh);
+      }
 
       if (i < loadedImages.length) {
         const img = loadedImages[i];
@@ -399,23 +426,23 @@ export default function PinkPhotobooth() {
 
         // Clip to slot rectangle with subtle rounded corners
         ctx.beginPath();
-        ctx.roundRect(sx, sy, sw, sh, 4);
+        ctx.roundRect(photoX, photoY, photoW, photoH, 4);
         ctx.clip();
 
         // Calculate aspect-fill cover
         const imgRatio = img.width / img.height;
-        const slotRatio = sw / sh;
-        let renderW = sw;
-        let renderH = sh;
+        const slotRatio = photoW / photoH;
+        let renderW = photoW;
+        let renderH = photoH;
         let offsetX = 0;
         let offsetY = 0;
 
         if (imgRatio > slotRatio) {
-          renderW = sh * imgRatio;
-          offsetX = (sw - renderW) / 2;
+          renderW = photoH * imgRatio;
+          offsetX = (photoW - renderW) / 2;
         } else {
-          renderH = sw / imgRatio;
-          offsetY = (sh - renderH) / 2;
+          renderH = photoW / imgRatio;
+          offsetY = (photoH - renderH) / 2;
         }
 
         // Apply filter CSS & adjustments
@@ -424,11 +451,18 @@ export default function PinkPhotobooth() {
           ctx.filter = filterCss;
         }
 
-        ctx.drawImage(img, sx + offsetX, sy + offsetY, renderW, renderH);
+        if (selectedFrame.accentStyle === "mini-gallery") {
+          ctx.save();
+          ctx.translate(photoX + photoW / 2, photoY + photoH / 2);
+          ctx.rotate(i % 2 === 0 ? -0.008 : 0.008);
+          ctx.translate(-(photoX + photoW / 2), -(photoY + photoH / 2));
+        }
+        ctx.drawImage(img, photoX + offsetX, photoY + offsetY, renderW, renderH);
+        if (selectedFrame.accentStyle === "mini-gallery") ctx.restore();
 
         // Apply Vignette and Grain directly on this slot
         if (adjustments.vignette > 0 || adjustments.grain > 0) {
-          applyVignetteAndGrainToCanvas(ctx, sw, sh, adjustments.vignette, adjustments.grain);
+          applyVignetteAndGrainToCanvas(ctx, photoW, photoH, adjustments.vignette, adjustments.grain);
         }
 
         ctx.restore();
@@ -440,7 +474,7 @@ export default function PinkPhotobooth() {
       } else {
         // Empty slot placeholder
         ctx.fillStyle = "rgba(0, 0, 0, 0.04)";
-        ctx.fillRect(sx, sy, sw, sh);
+        ctx.fillRect(photoX, photoY, photoW, photoH);
         ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
         ctx.setLineDash([6, 6]);
         ctx.strokeRect(sx, sy, sw, sh);
@@ -463,7 +497,10 @@ export default function PinkPhotobooth() {
     });
 
     // 4. Render Instagram Stickers & Custom Texts
-    drawStickersAndTextToCanvas(ctx, stickers, texts, canvasWidth, canvasHeight);
+    const chibiSheet = stickers.some((sticker) => sticker.type === "chibi")
+      ? await loadChibiSheet()
+      : undefined;
+    drawStickersAndTextToCanvas(ctx, stickers, texts, canvasWidth, canvasHeight, chibiSheet);
 
     return canvas.toDataURL("image/png", 1.0);
   }, [
@@ -495,18 +532,36 @@ export default function PinkPhotobooth() {
     }
   }, [compilePhotoboxCanvas]);
 
+  useEffect(() => {
+    if (currentStep !== "editor" || sessionPhotos.length === 0) return;
+    let cancelled = false;
+    const refreshCanvasPreview = async () => {
+      try {
+        const image = await compilePhotoboxCanvas();
+        if (!cancelled && image) setLivePreviewUrl(image);
+      } catch (error) {
+        console.error("Unable to refresh photobooth preview", error);
+      }
+    };
+    const timer = window.setTimeout(() => { void refreshCanvasPreview(); }, 100);
+    return () => { cancelled = true; window.clearTimeout(timer); };
+  }, [compilePhotoboxCanvas, currentStep, sessionPhotos.length]);
+
   // ─── STICKER & TEXT HELPERS ─────────────────────────────────────────────────
-  const handleAddSticker = (type: StickerItem["type"], label: string, color: string) => {
+  const handleAddSticker = (type: StickerItem["type"], label: string, color: string, pose?: number) => {
     playPopSound();
+    const stickerIndex = stickerIdRef.current + 1;
+    stickerIdRef.current = stickerIndex;
     const newSticker: StickerItem = {
-      id: `st-${Date.now()}`,
+      id: `st-${stickerIndex}`,
       type,
       label,
-      x: 35 + Math.random() * 30,
-      y: 35 + Math.random() * 30,
-      scale: 1.0,
-      rotation: Math.floor(Math.random() * 16 - 8),
+      x: type === "chibi" ? 88 : 35 + (stickerIndex % 3) * 8,
+      y: type === "chibi" ? 94 : 35 + (stickerIndex % 4) * 7,
+      scale: type === "chibi" ? 0.62 : 1.0,
+      rotation: (stickerIndex % 5 - 2) * 3,
       color,
+      pose,
     };
     setStickers((prev) => [...prev, newSticker]);
   };
@@ -529,13 +584,15 @@ export default function PinkPhotobooth() {
 
   const handleResetSession = () => {
     playPopSound();
+    stopCamera();
     setSessionPhotos([]);
     setPendingPhoto(null);
     setStickers([]);
     setTexts([]);
     setCompiledImageUrl(null);
+    setLivePreviewUrl(null);
     setIsFinalPopupOpen(false);
-    setCurrentStep("camera");
+    setCurrentStep("welcome");
   };
 
   // Filtered frames
@@ -546,6 +603,12 @@ export default function PinkPhotobooth() {
 
   // Filtered camera filters
   const displayedFilters = CAMERA_FILTERS.filter((f) => f.category === filterCategory);
+  const beginSession = () => {
+    setSessionPhotos([]);
+    setPendingPhoto(null);
+    setCurrentStep("camera");
+    void startCamera();
+  };
 
   return (
     <section
@@ -581,19 +644,20 @@ export default function PinkPhotobooth() {
             <button
               type="button"
               onClick={() => setCurrentStep("camera")}
+              disabled={currentStep === "welcome"}
               className={`px-3 py-1 rounded-full transition-colors ${
                 currentStep === "camera" || currentStep === "review_single"
                   ? "bg-[#A94F65] text-white font-medium"
                   : "bg-white/80 text-[#702C43]/70 hover:bg-[#FFF0F2]"
               }`}
             >
-              1. Camera ({sessionPhotos.length}/{selectedLayout.requiredPhotos})
+              2. Camera ({sessionPhotos.length}/{selectedLayout.requiredPhotos})
             </button>
             <span className="text-[#D58C9C]">•</span>
             <button
               type="button"
               onClick={() => {
-                if (sessionPhotos.length > 0) setCurrentStep("editor");
+                if (sessionPhotos.length > 0) { stopCamera(); setCurrentStep("editor"); }
               }}
               disabled={sessionPhotos.length === 0}
               className={`px-3 py-1 rounded-full transition-colors disabled:opacity-40 ${
@@ -602,7 +666,7 @@ export default function PinkPhotobooth() {
                   : "bg-white/80 text-[#702C43]/70 hover:bg-[#FFF0F2]"
               }`}
             >
-              2. Studio Editor
+              3. Studio Editor
             </button>
           </div>
         </div>
@@ -610,6 +674,25 @@ export default function PinkPhotobooth() {
         {/* ═════════════════════════════════════════════════════════════════════
             STEP 1 & 2: CAMERA VIEWPORT
             ═════════════════════════════════════════════════════════════════════ */}
+        {currentStep === "welcome" && (
+          <div className="rounded-[28px] border border-[#F0D4D8] bg-white/90 p-4 sm:p-7 shadow-xl backdrop-blur-sm">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5">
+              <div><p className="text-[10px] tracking-[.2em] text-[#A94F65] font-semibold uppercase">Choose your photo strip</p><h3 className="mt-1 font-serif text-2xl text-[#702C43]">Pick a little memory frame</h3><p className="mt-1 text-xs text-[#8E6874]">Your camera stays off until you press Start Camera.</p></div>
+              <span className="text-xs text-[#A94F65]">{PHOTOBOOTH_FRAMES.length} designs</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 max-h-[min(55vh,560px)] overflow-y-auto p-1">
+              {PHOTOBOOTH_FRAMES.map((frame) => <button key={frame.id} type="button" onClick={() => setSelectedFrame(frame)} aria-pressed={selectedFrame.id === frame.id} className={`rounded-2xl border p-2.5 text-left transition-all ${selectedFrame.id === frame.id ? "border-[#A94F65] bg-[#FFF0F2] ring-2 ring-[#A94F65]/25 shadow-md" : "border-[#F0E3E3] bg-white hover:border-[#D58C9C]"}`}><FrameMiniPreview frame={frame} /><span className="mt-2 block text-xs font-medium text-[#702C43]">{frame.name}</span><span className="mt-0.5 block text-[10px] leading-tight text-[#936D79] line-clamp-2">{frame.description}</span></button>)}
+            </div>
+            <div className="mt-4 flex flex-col items-center gap-2 rounded-2xl bg-[#FFF8F7] p-3 sm:flex-row sm:justify-center"><FrameMiniPreview frame={selectedFrame} /><div><p className="text-[10px] uppercase tracking-[.16em] text-[#A94F65]">Selected design</p><p className="font-serif text-sm text-[#702C43]">{selectedFrame.name}</p><p className="max-w-xs text-[10px] text-[#8E6874]">{selectedFrame.description}</p></div></div>
+            <div className="mt-5 grid gap-4 md:grid-cols-[1fr_1fr_1fr_auto] md:items-end border-t border-[#F1E2E4] pt-4">
+              <fieldset><legend className="mb-1.5 text-[11px] font-semibold text-[#702C43]">Number of photos</legend><div className="flex gap-2">{[3,4].map((count) => <button key={count} onClick={() => setSelectedLayout(PHOTOBOOTH_LAYOUTS[count === 3 ? "strip3" : "strip4"])} className={`rounded-xl px-4 py-2 text-xs border ${selectedLayout.requiredPhotos === count ? "bg-[#702C43] text-white border-[#702C43]" : "bg-white border-[#E7C9D0] text-[#702C43]"}`}>{count} Photos</button>)}</div></fieldset>
+              <label className="text-[11px] font-semibold text-[#702C43]">Starting filter<select value={selectedFilter.id} onChange={(e) => setSelectedFilter(CAMERA_FILTERS.find((f) => f.id === e.target.value) ?? CAMERA_FILTERS[0])} className="mt-1.5 block w-full rounded-xl border border-[#E7C9D0] bg-white px-3 py-2 text-xs font-normal">{CAMERA_FILTERS.map((filter) => <option key={filter.id} value={filter.id}>{filter.name}</option>)}</select></label>
+              <label className="flex items-center gap-2 text-xs text-[#702C43]"><input type="checkbox" checked={mirrorVideo} onChange={(e) => setMirrorVideo(e.target.checked)} className="accent-[#A94F65]" />Mirror front camera</label>
+              <button type="button" onClick={beginSession} className="min-h-11 rounded-full bg-gradient-to-r from-[#A94F65] to-[#702C43] px-6 py-3 text-sm font-medium text-white shadow-md hover:opacity-95 active:scale-[.98]">Start Camera <Camera className="ml-2 inline h-4 w-4" /></button>
+            </div>
+          </div>
+        )}
+
         {currentStep === "camera" && (
           <div className="bg-white/90 rounded-3xl border border-[#F4D1D5] shadow-xl p-4 sm:p-6 backdrop-blur-sm">
             {/* Top Camera Controls Bar */}
@@ -732,7 +815,7 @@ export default function PinkPhotobooth() {
                   )}
                   <button
                     type="button"
-                    onClick={startCamera}
+                    onClick={() => { void startCamera(); }}
                     className="py-2.5 px-6 rounded-full bg-[#A94F65] text-white font-medium text-xs shadow-md hover:bg-[#702C43] transition-colors cursor-pointer"
                   >
                     Start Camera ✨
@@ -844,7 +927,7 @@ export default function PinkPhotobooth() {
                   </span>
                   <button
                     type="button"
-                    onClick={() => setCurrentStep("editor")}
+                    onClick={() => { stopCamera(); setCurrentStep("editor"); }}
                     className="text-xs font-medium text-[#A94F65] hover:underline flex items-center gap-1"
                   >
                     <span>Open Editor</span>
@@ -896,7 +979,7 @@ export default function PinkPhotobooth() {
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFF0F2] text-[#A94F65] text-xs font-medium mb-3">
               <Sparkles className="w-3.5 h-3.5 text-[#D58C9C]" />
               <span>
-                Review Shot #{sessionPhotos.length + 1} of {selectedLayout.requiredPhotos}
+                Review Shot #{retakeTargetIndex !== null ? retakeTargetIndex + 1 : sessionPhotos.length + 1} of {selectedLayout.requiredPhotos}
               </span>
             </div>
             <h3 className="font-serif text-2xl text-[#702C43] font-medium">How does this look?</h3>
@@ -906,7 +989,7 @@ export default function PinkPhotobooth() {
 
             {/* Single Photo Preview */}
             <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-lg border border-[#F4D1D5] bg-black mb-6">
-              <img src={pendingPhoto} alt="Review capture" className="w-full h-full object-cover" />
+              <img src={pendingPhoto} alt="Review capture" className="w-full h-full object-cover" style={{ filter: getCombinedCssFilter(selectedFilter, adjustments) }} />
             </div>
 
             {/* RETAKE vs CONTINUE Buttons */}
@@ -1092,6 +1175,13 @@ export default function PinkPhotobooth() {
                 </div>
               </div>
 
+              {livePreviewUrl && (
+                <div className="mt-4 w-full rounded-2xl border border-[#F1E0E3] bg-[#FFFBFB] p-3 text-center">
+                  <span className="mb-2 block text-[10px] font-medium uppercase tracking-[.16em] text-[#A94F65]">Canvas print preview · matches PNG export</span>
+                  <img src={livePreviewUrl} alt={`${selectedFrame.name} photo strip preview`} className="mx-auto max-h-[60vh] w-auto max-w-full rounded-lg shadow-md" />
+                </div>
+              )}
+
               {/* Bottom Big Action Button: Finish & Print */}
               <div className="w-full mt-6">
                 <button
@@ -1173,15 +1263,7 @@ export default function PinkPhotobooth() {
                             : "border-[#F4D1D5] bg-white hover:bg-[#FFF5F7]"
                         }`}
                       >
-                        <div
-                          className="w-full h-8 rounded-lg mb-2 border border-black/10 flex items-center justify-center text-[10px] font-mono uppercase"
-                          style={{
-                            backgroundColor: frame.bgColor,
-                            color: frame.textColor,
-                          }}
-                        >
-                          Preview
-                        </div>
+                        <FrameMiniPreview frame={frame} compact />
                         <div className="font-serif text-xs font-medium text-[#702C43] truncate">
                           {frame.name}
                         </div>
@@ -1377,10 +1459,10 @@ export default function PinkPhotobooth() {
                       <button
                         key={st.id}
                         type="button"
-                        onClick={() => handleAddSticker(st.type, st.label, st.defaultColor)}
+                        onClick={() => handleAddSticker(st.type, st.label, st.defaultColor, st.type === "chibi" ? STICKER_PRESETS.filter((item) => item.type === "chibi").indexOf(st) : undefined)}
                         className="p-2.5 rounded-xl border border-[#F4D1D5] bg-white hover:bg-[#FFF0F2] text-xs text-[#702C43] flex items-center gap-2 transition-colors cursor-pointer"
                       >
-                        <span className="text-base">{st.previewIcon}</span>
+                        {st.type === "chibi" ? <ChibiStickerIcon pose={STICKER_PRESETS.filter((item) => item.type === "chibi").indexOf(st)} /> : <span className="text-base">{st.previewIcon}</span>}
                         <span className="truncate">{st.label}</span>
                       </button>
                     ))}
@@ -1404,11 +1486,9 @@ export default function PinkPhotobooth() {
                         {stickers.map((st, i) => (
                           <div
                             key={st.id}
-                            className="flex items-center justify-between p-1.5 rounded-lg bg-[#FFF0F2] text-xs text-[#702C43]"
+                            className="grid grid-cols-[1fr_auto] gap-2 p-2 rounded-lg bg-[#FFF0F2] text-xs text-[#702C43]"
                           >
-                            <span>
-                              #{i + 1} {st.label}
-                            </span>
+                            <div><span>#{i + 1} {st.label}</span><div className="mt-1 flex gap-2"><label>Position <select value={st.y < 25 ? (st.x < 50 ? "top-left" : "top-right") : st.y > 75 ? (st.x < 50 ? "bottom-left" : "bottom-right") : "center"} onChange={(e) => { const positions: Record<string, [number, number]> = { "top-left": [12, 6], "top-right": [88, 6], "bottom-left": [12, 94], "bottom-right": [88, 94], center: [50, 50] }; const [x, y] = positions[e.target.value]; setStickers((prev) => prev.map((item, idx) => idx === i ? { ...item, x, y } : item)); }} className="rounded border bg-white"><option value="top-left">Top left</option><option value="top-right">Top right</option><option value="bottom-left">Bottom left</option><option value="bottom-right">Bottom right</option><option value="center">Center</option></select></label><label>Size <input type="range" min={st.type === "chibi" ? .3 : .6} max={st.type === "chibi" ? 1.05 : 2} step=".05" value={st.scale} onChange={(e) => setStickers((prev) => prev.map((item, idx) => idx === i ? { ...item, scale: Number(e.target.value) } : item))} className="w-16 accent-[#A94F65]" /></label></div></div>
                             <button
                               type="button"
                               onClick={() => setStickers((prev) => prev.filter((_, idx) => idx !== i))}
@@ -1552,4 +1632,57 @@ export default function PinkPhotobooth() {
       />
     </section>
   );
+}
+
+let chibiSheetPromise: Promise<HTMLImageElement> | undefined;
+function loadChibiSheet() {
+  if (!chibiSheetPromise) {
+    chibiSheetPromise = new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = reject;
+      image.src = "/stickers/alura-chibi-pack.png";
+    });
+  }
+  return chibiSheetPromise;
+}
+
+function waitForVideoFrame(video: HTMLVideoElement | null): Promise<void> {
+  if (!video) return Promise.resolve();
+  return new Promise((resolve) => {
+    const started = performance.now();
+    const check = () => {
+      if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA && video.videoWidth > 0 && video.videoHeight > 0) {
+        resolve();
+      } else if (performance.now() - started > 2500) {
+        resolve();
+      } else {
+        requestAnimationFrame(check);
+      }
+    };
+    check();
+  });
+}
+
+function ChibiStickerIcon({ pose }: { pose: number }) {
+  const col = pose % 3;
+  const row = Math.floor(pose / 3);
+  return <span className="relative block h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-[#FFF7F5]"><img src="/stickers/alura-chibi-pack.png" alt="" className="absolute max-w-none" style={{ width: "300%", height: "200%", left: `${-col * 100}%`, top: `${-row * 100}%` }} /></span>;
+}
+
+function FrameMiniPreview({ frame, compact = false }: { frame: PhotoboothFrame; compact?: boolean }) {
+  const slots = 4;
+  const isDenim = frame.accentStyle === "denim-diary";
+  const isGallery = frame.accentStyle === "mini-gallery";
+  return <div className={`relative mx-auto flex w-full items-center justify-center overflow-hidden rounded-xl border ${compact ? "h-16" : "h-[112px]"}`} style={{ background: frame.bgColor, borderColor: frame.borderColor }}>
+    {isDenim && <div className="absolute inset-0 opacity-40" style={{ backgroundImage: "repeating-linear-gradient(90deg,transparent 0 5px,rgba(255,255,255,.14) 6px 7px),repeating-linear-gradient(0deg,transparent 0 9px,rgba(0,0,0,.12) 10px 11px)" }} />}
+    {(frame.accentStyle === "maroon-scrapbook" || isDenim) && <><i className="absolute left-0 top-0 h-1/4 w-1/5 opacity-90" style={{ backgroundImage: `conic-gradient(${frame.accentStyle === "maroon-scrapbook" ? "#a93442" : "#b3474c"} 25%,#f3e6d5 0 50%,#a93442 0 75%,#f3e6d5 0)`, backgroundSize: "12px 12px" }} /><i className="absolute bottom-0 right-0 h-1/5 w-1/4 opacity-80" style={{ backgroundImage: "repeating-linear-gradient(45deg,rgba(255,255,255,.22) 0 2px,transparent 2px 5px)" }} /></>}
+    <div className={`relative flex flex-col gap-[3px] rounded-sm p-1.5 shadow-md ${isGallery ? "-rotate-2" : ""}`} style={{ width: compact ? "43%" : "42%", height: compact ? "82%" : "86%", background: isGallery ? "#fff" : frame.bgColor, border: `1px solid ${frame.borderColor}` }}>
+      <span className="h-[7%] truncate text-center font-mono text-[5px] leading-none" style={{ color: frame.subtextColor }}>{frame.headerText}</span>
+      {Array.from({ length: slots }).map((_, i) => <span key={i} className="min-h-0 flex-1 rounded-[2px] border border-black/10" style={{ background: i % 2 ? "linear-gradient(135deg,#f0c6cb,#d8aeb3)" : "linear-gradient(135deg,#d5d7d3,#a6a9a6)" }} />)}
+      <span className="truncate text-center font-serif text-[5px] italic leading-none" style={{ color: frame.textColor }}>{frame.footerText}</span>
+    </div>
+    {!compact && frame.accentStyle === "maroon-scrapbook" && <span className="absolute bottom-2 right-2 text-lg">★</span>}
+    {!compact && isGallery && <span className="absolute right-2 top-2 text-[8px]" style={{ color: frame.subtextColor }}>♡</span>}
+  </div>;
 }

@@ -11,6 +11,12 @@ export type StickerPreset = {
 };
 
 export const STICKER_PRESETS: StickerPreset[] = [
+  { id: "chibi-wave", type: "chibi", label: "Alura waving", previewIcon: "♡", defaultColor: "#D58C9C" },
+  { id: "chibi-heart", type: "chibi", label: "Alura finger heart", previewIcon: "♡", defaultColor: "#D58C9C" },
+  { id: "chibi-lily", type: "chibi", label: "Alura & lily", previewIcon: "✿", defaultColor: "#D58C9C" },
+  { id: "chibi-peek", type: "chibi", label: "Alura peek", previewIcon: "◡", defaultColor: "#D58C9C" },
+  { id: "chibi-teddy", type: "chibi", label: "Alura & teddy", previewIcon: "♡", defaultColor: "#D58C9C" },
+  { id: "chibi-mini-heart", type: "chibi", label: "Alura mini heart", previewIcon: "♥", defaultColor: "#D58C9C" },
   { id: "st-heart-pink", type: "heart", label: "Heart Pink", previewIcon: "🤍", defaultColor: "#F4D1D5" },
   { id: "st-heart-rose", type: "heart", label: "Heart Rose", previewIcon: "💗", defaultColor: "#E8B5C0" },
   { id: "st-sparkle", type: "sparkle", label: "Sparkle", previewIcon: "✨", defaultColor: "#FDE68A" },
@@ -47,7 +53,8 @@ export function drawStickersAndTextToCanvas(
   stickers: StickerItem[],
   texts: TextOverlayItem[],
   canvasW: number,
-  canvasH: number
+  canvasH: number,
+  chibiSheet?: HTMLImageElement
 ) {
   // 1. Draw Stickers
   for (const st of stickers) {
@@ -59,7 +66,12 @@ export function drawStickersAndTextToCanvas(
     ctx.rotate((st.rotation * Math.PI) / 180);
     ctx.scale(st.scale, st.scale);
 
-    if (st.type === "heart") {
+    if (st.type === "chibi" && chibiSheet?.complete) {
+      const pose = Math.max(0, Math.min(5, st.pose ?? 0));
+      const cellW = chibiSheet.naturalWidth / 3;
+      const cellH = chibiSheet.naturalHeight / 2;
+      ctx.drawImage(chibiSheet, (pose % 3) * cellW, Math.floor(pose / 3) * cellH, cellW, cellH, -76, -76, 152, 152);
+    } else if (st.type === "heart") {
       ctx.fillStyle = st.color;
       ctx.beginPath();
       ctx.moveTo(0, 4);

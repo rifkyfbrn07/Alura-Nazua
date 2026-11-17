@@ -37,7 +37,10 @@ export type PhotoboothFrame = {
     | "editorial"
     | "polaroid"
     | "contact-sheet"
-    | "photo-dump";
+    | "photo-dump"
+    | "maroon-scrapbook"
+    | "denim-diary"
+    | "mini-gallery";
   previewBg: string;
 };
 
@@ -66,7 +69,7 @@ export type AdjustmentSettings = {
   blur: number; // 0 to 100, default 0
 };
 
-export type StickerType = "heart" | "sparkle" | "star" | "bow" | "label" | "datestamp";
+export type StickerType = "heart" | "sparkle" | "star" | "bow" | "label" | "datestamp" | "chibi";
 
 export type StickerItem = {
   id: string;
@@ -77,6 +80,7 @@ export type StickerItem = {
   scale: number; // 0.6 - 2.0
   rotation: number; // degrees -180 to 180
   color: string;
+  pose?: number;
 };
 
 export type TextOverlayItem = {
@@ -96,6 +100,8 @@ export type CapturedPhoto = {
 };
 
 export type PhotoboothStep =
+  | "welcome"
+  | "welcome"
   | "camera"
   | "review_single"
   | "session_tray"

@@ -220,10 +220,52 @@ export const PHOTOBOOTH_FRAMES: PhotoboothFrame[] = [
     accentStyle: "lily-signature",
     previewBg: "#FFFDFB",
   },
+  {
+    id: "maroon-scrapbook",
+    name: "Maroon Scrapbook",
+    category: "coquette",
+    description: "Burgundy paper layers, gingham patches, stitched stars and tiny keepsakes",
+    bgColor: "#6D1425",
+    textColor: "#FFF8EF",
+    subtextColor: "#F2C9C3",
+    borderColor: "#9A2835",
+    headerText: "LITTLE MOMENTS · VOL. 01",
+    footerText: "kept close, always",
+    accentStyle: "maroon-scrapbook",
+    previewBg: "#6D1425",
+  },
+  {
+    id: "denim-diary",
+    name: "Denim Diary",
+    category: "coquette",
+    description: "Indigo denim texture, gingham fabric patches and retro ticket details",
+    bgColor: "#17253C",
+    textColor: "#FFF8EA",
+    subtextColor: "#D8C5A9",
+    borderColor: "#405577",
+    headerText: "THE LITTLE MEMORY CLUB",
+    footerText: "one day at a time",
+    accentStyle: "denim-diary",
+    previewBg: "#17253C",
+  },
+  {
+    id: "mini-gallery",
+    name: "Mini Gallery",
+    category: "instagram",
+    description: "Airy white gallery cards with tiny original character details",
+    bgColor: "#FCFCFA",
+    textColor: "#394858",
+    subtextColor: "#7892A2",
+    borderColor: "#E6ECEC",
+    headerText: "TODAY · LITTLE GALLERY",
+    footerText: "a favorite little day",
+    accentStyle: "mini-gallery",
+    previewBg: "#FCFCFA",
+  },
 ];
 
 export const FRAME_CATEGORIES: { id: FrameCategory; name: string }[] = [
-  { id: "all", name: "All Frames (15)" },
+  { id: "all", name: "All Frames (18)" },
   { id: "classic", name: "Classic Photobox" },
   { id: "instagram", name: "Instagram Style" },
   { id: "coquette", name: "Cute & Coquette" },
@@ -342,7 +384,48 @@ export function drawPhotoboxFrame(
   }
 
   // 2. Specific Accent Styles
-  if (frame.accentStyle === "coquette-bows") {
+  if (frame.accentStyle === "maroon-scrapbook") {
+    drawGinghamPatch(ctx, 0, 0, canvasW * 0.19, canvasH * 0.075, "#F7E9D7", "#AD3440", true);
+    drawGinghamPatch(ctx, canvasW * 0.77, canvasH * 0.925, canvasW * 0.23, canvasH * 0.075, "#F7E9D7", "#AD3440", true);
+    ctx.strokeStyle = "#F3D8C4";
+    ctx.lineWidth = 5;
+    ctx.setLineDash([10, 8]);
+    ctx.strokeRect(15, 15, canvasW - 30, canvasH - 30);
+    ctx.setLineDash([]);
+    drawScrapbookStar(ctx, canvasW * 0.08, canvasH * 0.30, 22, "#EBCB8A");
+    drawScrapbookStar(ctx, canvasW * 0.92, canvasH * 0.72, 18, "#F7E9D7");
+    drawTinyTeddy(ctx, canvasW * 0.82, canvasH * 0.965, Math.min(64, canvasW * 0.1));
+    drawTape(ctx, canvasW * 0.50, canvasH * 0.02, canvasW * 0.24, 14, "#EAC7B7", -0.035);
+  } else if (frame.accentStyle === "denim-diary") {
+    ctx.fillStyle = "#263853";
+    const edge = canvasW * .08;
+    for (let x = 0; x < edge; x += 12) {
+      ctx.fillStyle = x % 24 ? "rgba(255,255,255,.07)" : "rgba(0,0,0,.12)";
+      ctx.fillRect(x, 0, 5, canvasH);
+      ctx.fillRect(canvasW - edge + x, 0, 5, canvasH);
+    }
+    drawGinghamPatch(ctx, 0, canvasH * 0.91, canvasW * 0.20, canvasH * 0.09, "#F4E7D3", "#AF3941", true);
+    drawGinghamPatch(ctx, canvasW * 0.80, 0, canvasW * 0.20, canvasH * 0.085, "#F4E7D3", "#AF3941", true);
+    drawScrapbookStar(ctx, canvasW * 0.08, canvasH * 0.44, 25, "#BD4550");
+    drawScrapbookStar(ctx, canvasW * 0.92, canvasH * 0.57, 18, "#D6B66F");
+    drawTicket(ctx, canvasW * 0.5, canvasH * 0.975, canvasW * 0.42, 34, frame.subtextColor, "MEMORY TICKET · 001");
+    drawTape(ctx, canvasW * 0.5, canvasH * 0.02, canvasW * 0.24, 12, "#C6A898", 0.025);
+  } else if (frame.accentStyle === "mini-gallery") {
+    // Gallery style: fine card edges and restrained interface glyphs.
+    ctx.strokeStyle = "#E7ECEB";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(18, 18, canvasW - 36, canvasH - 36);
+    ctx.fillStyle = "#E4A3AE";
+    ctx.beginPath(); ctx.arc(34, 38, 6, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = frame.subtextColor;
+    ctx.font = "16px sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("♥", 30, canvasH - 18);
+    ctx.textAlign = "right";
+    ctx.fillText("···", canvasW - 24, canvasH - 18);
+    ctx.textAlign = "center";
+    drawMiniCompanion(ctx, canvasW * 0.90, canvasH * 0.04, Math.min(44, canvasW * 0.07));
+  } else if (frame.accentStyle === "coquette-bows") {
     // 4 Tiny elegant vector bows in corners
     const bowSize = 26;
     const margin = borderThickness + 24;
@@ -443,4 +526,47 @@ export function drawPhotoboxFrame(
   }
 
   ctx.restore();
+}
+
+function drawGinghamPatch(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, light: string, red: string, diagonal = false) {
+  ctx.save();
+  ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+  ctx.fillStyle = light; ctx.fillRect(x, y, w, h);
+  const cell = Math.max(10, Math.min(w, h) / 5);
+  ctx.fillStyle = red;
+  for (let row = 0; row * cell < h + cell; row++) for (let col = 0; col * cell < w + cell; col++) {
+    if ((row + col) % 2 === 0) ctx.fillRect(x + col * cell, y + row * cell, cell, cell);
+  }
+  if (diagonal) { ctx.globalAlpha = .2; ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; for (let d = -h; d < w; d += cell) { ctx.beginPath(); ctx.moveTo(x + d, y); ctx.lineTo(x + d + h, y + h); ctx.stroke(); } }
+  ctx.restore();
+}
+
+function drawScrapbookStar(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number, color: string) {
+  ctx.save(); ctx.translate(cx, cy); ctx.rotate(-.14); ctx.fillStyle = color; ctx.strokeStyle = "#FFF7E9"; ctx.lineWidth = 4; ctx.beginPath();
+  for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * .48 : r; if (!i) ctx.moveTo(Math.cos(a) * rr, Math.sin(a) * rr); else ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+  ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+}
+
+function drawTinyTeddy(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number) {
+  ctx.save(); ctx.fillStyle = "#D8AA80"; ctx.strokeStyle = "#FFF8EB"; ctx.lineWidth = 3;
+  for (const dx of [-.26, .26]) { ctx.beginPath(); ctx.arc(cx + size * dx, cy - size * .37, size * .18, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); }
+  ctx.beginPath(); ctx.ellipse(cx, cy, size * .34, size * .42, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = "#5B3028"; ctx.beginPath(); ctx.arc(cx - size * .11, cy - size * .05, 2.5, 0, Math.PI * 2); ctx.arc(cx + size * .11, cy - size * .05, 2.5, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(cx, cy + size * .06, size * .06, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+}
+
+function drawTape(ctx: CanvasRenderingContext2D, cx: number, cy: number, w: number, h: number, color: string, angle: number) {
+  ctx.save(); ctx.translate(cx, cy); ctx.rotate(angle); ctx.globalAlpha = .82; ctx.fillStyle = color; ctx.fillRect(-w / 2, -h / 2, w, h); ctx.restore();
+}
+
+function drawTicket(ctx: CanvasRenderingContext2D, cx: number, cy: number, w: number, h: number, color: string, text: string) {
+  ctx.save(); ctx.translate(cx, cy); ctx.rotate(-.025); ctx.fillStyle = "#F5EBDD"; ctx.fillRect(-w / 2, -h / 2, w, h); ctx.strokeStyle = color; ctx.setLineDash([4, 4]); ctx.strokeRect(-w / 2 + 5, -h / 2 + 4, w - 10, h - 8); ctx.setLineDash([]); ctx.fillStyle = "#443A35"; ctx.font = "bold 12px monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, 0, 0); ctx.restore();
+}
+
+function drawMiniCompanion(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number) {
+  ctx.save(); ctx.fillStyle = "#E7B6A4"; ctx.strokeStyle = "#FFF"; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(cx, cy, size * .34, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = "#D68F99"; ctx.beginPath(); ctx.arc(cx, cy - size * .15, size * .38, Math.PI, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = "#49343A"; ctx.beginPath(); ctx.arc(cx - size * .12, cy, 2, 0, Math.PI * 2); ctx.arc(cx + size * .12, cy, 2, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = "#E99BA5"; ctx.beginPath(); ctx.arc(cx, cy + size * .1, size * .04, 0, Math.PI * 2); ctx.fill(); ctx.restore();
 }
