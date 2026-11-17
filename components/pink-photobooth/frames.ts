@@ -233,6 +233,7 @@ export const PHOTOBOOTH_FRAMES: PhotoboothFrame[] = [
     footerText: "kept close, always",
     accentStyle: "maroon-scrapbook",
     previewBg: "#6D1425",
+    photoCount: 4,
   },
   {
     id: "denim-diary",
@@ -247,6 +248,7 @@ export const PHOTOBOOTH_FRAMES: PhotoboothFrame[] = [
     footerText: "one day at a time",
     accentStyle: "denim-diary",
     previewBg: "#17253C",
+    photoCount: 4,
   },
   {
     id: "mini-gallery",
@@ -261,11 +263,42 @@ export const PHOTOBOOTH_FRAMES: PhotoboothFrame[] = [
     footerText: "a favorite little day",
     accentStyle: "mini-gallery",
     previewBg: "#FCFCFA",
+    photoCount: 2,
+  },
+  {
+    id: "alura-toybox",
+    name: "Alura Toybox",
+    category: "coquette",
+    description: "A blush keepsake box with Alura, a tiny bear, bows, and lily details",
+    bgColor: "#FFF0F1",
+    textColor: "#713246",
+    subtextColor: "#B45D76",
+    borderColor: "#EAB8C5",
+    headerText: "ALURA'S LITTLE TOYBOX",
+    footerText: "a pocketful of sweet days",
+    accentStyle: "alura-toybox",
+    previewBg: "#FFF0F1",
+    photoCount: 3,
+  },
+  {
+    id: "little-toy-friends",
+    name: "Little Toy Friends",
+    category: "coquette",
+    description: "Soft toy-shop paper layers, plush friends, clouds, and little stars",
+    bgColor: "#F4F1FA",
+    textColor: "#4D4567",
+    subtextColor: "#80779B",
+    borderColor: "#D7CFE8",
+    headerText: "THE LITTLE PLAYROOM",
+    footerText: "friends make every day brighter",
+    accentStyle: "little-toy-friends",
+    previewBg: "#F4F1FA",
+    photoCount: 4,
   },
 ];
 
 export const FRAME_CATEGORIES: { id: FrameCategory; name: string }[] = [
-  { id: "all", name: "All Frames (18)" },
+  { id: "all", name: "All Frames (20)" },
   { id: "classic", name: "Classic Photobox" },
   { id: "instagram", name: "Instagram Style" },
   { id: "coquette", name: "Cute & Coquette" },
@@ -369,9 +402,10 @@ export function drawPhotoboxFrame(
     showDate?: boolean;
     displayDate?: string;
     borderThickness?: number;
+    chibiSheet?: HTMLImageElement;
   }
 ) {
-  const { customCaption, showDate = true, displayDate, borderThickness = 12 } = options;
+  const { customCaption, showDate = true, displayDate, borderThickness = 12, chibiSheet } = options;
   const isDark = frame.id === "korean-four-cut" || frame.id === "vintage-black" || frame.id === "instagram-story" || frame.id === "contact-sheet";
 
   ctx.save();
@@ -385,17 +419,26 @@ export function drawPhotoboxFrame(
 
   // 2. Specific Accent Styles
   if (frame.accentStyle === "maroon-scrapbook") {
-    drawGinghamPatch(ctx, 0, 0, canvasW * 0.19, canvasH * 0.075, "#F7E9D7", "#AD3440", true);
+    drawGinghamPatch(ctx, 0, 0, canvasW * 0.19, canvasH * 0.044, "#F7E9D7", "#AD3440", true);
     drawGinghamPatch(ctx, canvasW * 0.77, canvasH * 0.925, canvasW * 0.23, canvasH * 0.075, "#F7E9D7", "#AD3440", true);
     ctx.strokeStyle = "#F3D8C4";
     ctx.lineWidth = 5;
     ctx.setLineDash([10, 8]);
     ctx.strokeRect(15, 15, canvasW - 30, canvasH - 30);
     ctx.setLineDash([]);
-    drawScrapbookStar(ctx, canvasW * 0.08, canvasH * 0.30, 22, "#EBCB8A");
-    drawScrapbookStar(ctx, canvasW * 0.92, canvasH * 0.72, 18, "#F7E9D7");
+    drawScrapbookStar(ctx, canvasW * 0.03, canvasH * 0.30, 18, "#EBCB8A");
+    drawScrapbookStar(ctx, canvasW * 0.975, canvasH * 0.72, 15, "#F7E9D7");
     drawTinyTeddy(ctx, canvasW * 0.82, canvasH * 0.965, Math.min(64, canvasW * 0.1));
     drawTape(ctx, canvasW * 0.50, canvasH * 0.02, canvasW * 0.24, 14, "#EAC7B7", -0.035);
+    drawSafetyPin(ctx, canvasW * 0.035, canvasH * .51, 24, "#F5E6CF");
+    ctx.globalAlpha = .08;
+    ctx.fillStyle = "#F3D7C2";
+    for (let i = 0; i < 70; i++) {
+      const x = (i * 97) % canvasW;
+      const y = (i * 193) % canvasH;
+      if (x < canvasW * .07 || x > canvasW * .93 || y < canvasH * .045 || y > canvasH * .91) ctx.fillRect(x, y, 3, 2);
+    }
+    ctx.globalAlpha = 1;
   } else if (frame.accentStyle === "denim-diary") {
     ctx.fillStyle = "#263853";
     const edge = canvasW * .08;
@@ -405,11 +448,13 @@ export function drawPhotoboxFrame(
       ctx.fillRect(canvasW - edge + x, 0, 5, canvasH);
     }
     drawGinghamPatch(ctx, 0, canvasH * 0.91, canvasW * 0.20, canvasH * 0.09, "#F4E7D3", "#AF3941", true);
-    drawGinghamPatch(ctx, canvasW * 0.80, 0, canvasW * 0.20, canvasH * 0.085, "#F4E7D3", "#AF3941", true);
-    drawScrapbookStar(ctx, canvasW * 0.08, canvasH * 0.44, 25, "#BD4550");
-    drawScrapbookStar(ctx, canvasW * 0.92, canvasH * 0.57, 18, "#D6B66F");
+    drawGinghamPatch(ctx, canvasW * 0.80, 0, canvasW * 0.20, canvasH * 0.044, "#F4E7D3", "#AF3941", true);
+    drawScrapbookStar(ctx, canvasW * 0.03, canvasH * 0.44, 18, "#BD4550");
+    drawScrapbookStar(ctx, canvasW * 0.975, canvasH * 0.57, 15, "#D6B66F");
     drawTicket(ctx, canvasW * 0.5, canvasH * 0.975, canvasW * 0.42, 34, frame.subtextColor, "MEMORY TICKET · 001");
     drawTape(ctx, canvasW * 0.5, canvasH * 0.02, canvasW * 0.24, 12, "#C6A898", 0.025);
+    drawCherry(ctx, canvasW * .06, canvasH * .21, 19);
+    drawCherry(ctx, canvasW * .94, canvasH * .80, 16);
   } else if (frame.accentStyle === "mini-gallery") {
     // Gallery style: fine card edges and restrained interface glyphs.
     ctx.strokeStyle = "#E7ECEB";
@@ -425,6 +470,25 @@ export function drawPhotoboxFrame(
     ctx.fillText("···", canvasW - 24, canvasH - 18);
     ctx.textAlign = "center";
     drawMiniCompanion(ctx, canvasW * 0.90, canvasH * 0.04, Math.min(44, canvasW * 0.07));
+  } else if (frame.accentStyle === "alura-toybox") {
+    drawGinghamPatch(ctx, 0, canvasH * .925, canvasW * .17, canvasH * .075, "#FFF7EA", "#E8A9B8");
+    drawTape(ctx, canvasW * .47, canvasH * .025, canvasW * .26, 14, "#F1C8CE", -.03);
+    drawVectorBow(ctx, canvasW * .035, canvasH * .32, 18, "#C77B91");
+    drawScrapbookStar(ctx, canvasW * .975, canvasH * .34, 14, "#E7C47B");
+    drawTinyTeddy(ctx, canvasW * .11, canvasH * .96, 54);
+    drawLilyBadge(ctx, canvasW * .85, canvasH * .96, 28);
+    drawChibiSticker(ctx, chibiSheet, 4, canvasW * .95, canvasH * .965, 78);
+    drawToyboxLabel(ctx, canvasW * .49, canvasH * .955, canvasW * .43, 34);
+  } else if (frame.accentStyle === "little-toy-friends") {
+    drawPaperPatch(ctx, 0, 0, canvasW * .20, canvasH * .044, "#E4DCEF");
+    drawPaperPatch(ctx, canvasW * .80, canvasH * .90, canvasW * .20, canvasH * .10, "#F6DDE2");
+    drawCloud(ctx, canvasW * .13, canvasH * .025, 32, "#FFFDFC");
+    drawCloud(ctx, canvasW * .87, canvasH * .965, 28, "#FFFDFC");
+    drawScrapbookStar(ctx, canvasW * .025, canvasH * .67, 15, "#E8C66E");
+    drawScrapbookStar(ctx, canvasW * .975, canvasH * .29, 14, "#B6A9D5");
+    drawTinyTeddy(ctx, canvasW * .10, canvasH * .96, 53);
+    drawBunny(ctx, canvasW * .90, canvasH * .96, 52);
+    drawToyboxLabel(ctx, canvasW * .5, canvasH * .955, canvasW * .45, 34);
   } else if (frame.accentStyle === "coquette-bows") {
     // 4 Tiny elegant vector bows in corners
     const bowSize = 26;
@@ -569,4 +633,46 @@ function drawMiniCompanion(ctx: CanvasRenderingContext2D, cx: number, cy: number
   ctx.fillStyle = "#D68F99"; ctx.beginPath(); ctx.arc(cx, cy - size * .15, size * .38, Math.PI, Math.PI * 2); ctx.fill();
   ctx.fillStyle = "#49343A"; ctx.beginPath(); ctx.arc(cx - size * .12, cy, 2, 0, Math.PI * 2); ctx.arc(cx + size * .12, cy, 2, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = "#E99BA5"; ctx.beginPath(); ctx.arc(cx, cy + size * .1, size * .04, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+}
+
+function drawSafetyPin(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, color: string) {
+  ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.lineCap = "round";
+  ctx.beginPath(); ctx.moveTo(x, y - size); ctx.lineTo(x + size * .25, y + size * .72); ctx.quadraticCurveTo(x + size * .33, y + size, x + size * .08, y + size * .88); ctx.lineTo(x - size * .18, y - size * .63); ctx.quadraticCurveTo(x - size * .25, y - size, x, y - size); ctx.stroke();
+  ctx.beginPath(); ctx.arc(x - size * .1, y - size * .86, size * .15, Math.PI, Math.PI * 1.8); ctx.stroke(); ctx.restore();
+}
+
+function drawCherry(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
+  ctx.save(); ctx.strokeStyle = "#597252"; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x + size * .1, y - size, x + size * .48, y - size * .75); ctx.moveTo(x, y); ctx.quadraticCurveTo(x - size * .2, y - size, x - size * .5, y - size * .65); ctx.stroke();
+  ctx.fillStyle = "#B33143"; ctx.strokeStyle = "#FFF4E8"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x - size * .45, y, size * .29, 0, Math.PI * 2); ctx.arc(x + size * .34, y + size * .08, size * .29, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.restore();
+}
+
+function drawLilyBadge(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
+  ctx.save(); ctx.strokeStyle = "#64805C"; ctx.lineWidth = 2.2; ctx.beginPath(); ctx.moveTo(x, y + size); ctx.lineTo(x, y - size * .65); ctx.stroke();
+  for (let i = -2; i <= 2; i++) { ctx.save(); ctx.translate(x, y - size * .65); ctx.rotate(i * .38); ctx.beginPath(); ctx.ellipse(0, -size * .25, size * .12, size * .36, 0, 0, Math.PI * 2); ctx.fillStyle = i % 2 ? "#FFFDF8" : "#F7E8E5"; ctx.fill(); ctx.stroke(); ctx.restore(); }
+  ctx.restore();
+}
+
+function drawChibiSticker(ctx: CanvasRenderingContext2D, sheet: HTMLImageElement | undefined, pose: number, x: number, y: number, size: number) {
+  if (!sheet?.complete || !sheet.naturalWidth) { drawMiniCompanion(ctx, x, y, size * .65); return; }
+  const cellW = sheet.naturalWidth / 3, cellH = sheet.naturalHeight / 2;
+  ctx.drawImage(sheet, (pose % 3) * cellW, Math.floor(pose / 3) * cellH, cellW, cellH, x - size / 2, y - size / 2, size, size);
+}
+
+function drawToyboxLabel(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(-.025); ctx.fillStyle = "#FFF9F2"; ctx.fillRect(-w / 2, -h / 2, w, h); ctx.strokeStyle = "#DCA8B2"; ctx.setLineDash([4, 4]); ctx.strokeRect(-w / 2 + 4, -h / 2 + 3, w - 8, h - 6); ctx.setLineDash([]); ctx.fillStyle = "#8A5264"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.font = "italic 13px Georgia, serif"; ctx.fillText("a little keepsake", 0, 0); ctx.restore();
+}
+
+function drawPaperPatch(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, color: string) {
+  ctx.save(); ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + w, y + 8); ctx.lineTo(x + w * .92, y + h); ctx.lineTo(x, y + h * .9); ctx.closePath(); ctx.fill(); ctx.strokeStyle = "rgba(255,255,255,.8)"; ctx.setLineDash([5, 4]); ctx.stroke(); ctx.restore();
+}
+
+function drawCloud(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, color: string) {
+  ctx.save(); ctx.fillStyle = color; ctx.strokeStyle = "#DCD4E8"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x - size * .28, y, size * .23, 0, Math.PI * 2); ctx.arc(x, y - size * .13, size * .31, 0, Math.PI * 2); ctx.arc(x + size * .29, y, size * .22, 0, Math.PI * 2); ctx.rect(x - size * .46, y, size * .92, size * .2); ctx.fill(); ctx.stroke(); ctx.restore();
+}
+
+function drawBunny(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
+  ctx.save(); ctx.fillStyle = "#F1D5CF"; ctx.strokeStyle = "#FFF9F1"; ctx.lineWidth = 3;
+  ctx.save(); ctx.translate(x - size * .15, y - size * .38); ctx.rotate(-.13); ctx.beginPath(); ctx.ellipse(0, 0, size * .12, size * .33, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.restore();
+  ctx.save(); ctx.translate(x + size * .15, y - size * .38); ctx.rotate(.13); ctx.beginPath(); ctx.ellipse(0, 0, size * .12, size * .33, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.restore();
+  ctx.beginPath(); ctx.arc(x, y, size * .34, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); ctx.fillStyle = "#704C55"; ctx.beginPath(); ctx.arc(x - size * .11, y, 2.2, 0, Math.PI * 2); ctx.arc(x + size * .11, y, 2.2, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = "#D58C9C"; ctx.beginPath(); ctx.arc(x, y + size * .12, 3, 0, Math.PI * 2); ctx.fill(); ctx.restore();
 }

@@ -40,13 +40,18 @@ export default function MemoryOrbit() {
 
   const angleRef = useRef<number>(0);
   const velocityRef = useRef<number>(0.0018);
+  const inertiaRef = useRef<number>(0);
   const heartExpansionRef = useRef<number>(1);
   const orbitPushRef = useRef<number>(0);
 
-  const dragRef = useRef<{ isDragging: boolean; startX: number; startAngle: number; moved: boolean }>({
+  const dragRef = useRef<{ isDragging: boolean; pointerId: number | null; startX: number; startY: number; startAngle: number; lastX: number; lastTime: number; moved: boolean }>({
     isDragging: false,
+    pointerId: null,
     startX: 0,
+    startY: 0,
     startAngle: 0,
+    lastX: 0,
+    lastTime: 0,
     moved: false,
   });
 
@@ -66,10 +71,10 @@ export default function MemoryOrbit() {
 
   useEffect(() => {
     const q = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReducedMotion(q.matches);
+    const frame = window.requestAnimationFrame(() => setReducedMotion(q.matches));
     const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
     q.addEventListener("change", handler);
-    return () => q.removeEventListener("change", handler);
+    return () => { window.cancelAnimationFrame(frame); q.removeEventListener("change", handler); };
   }, []);
 
   // Pause heavy canvas and 3D calculations when offscreen
@@ -282,8 +287,12 @@ export default function MemoryOrbit() {
 
     const tick = () => {
       // Natural orbit rotation if not dragging and not zoomed into a photo
-      if (!reducedMotion && !dragRef.current.isDragging && !activePhoto) {
-        angleRef.current += velocityRef.current;
+      if (!dragRef.current.isDragging && !activePhoto) {
+        if (!reducedMotion) {
+          inertiaRef.current *= 0.94;
+          if (Math.abs(inertiaRef.current) < 0.00008) inertiaRef.current = 0;
+          angleRef.current += velocityRef.current + inertiaRef.current;
+        }
       }
 
       const w = dimsRef.current.w;
@@ -333,25 +342,59 @@ export default function MemoryOrbit() {
 
   // Pointer drag controls (Mouse, Touch, Stylus)
   const handlePointerDown = (e: React.PointerEvent) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
     dragRef.current = {
-      isDragging: true,
+      isDragging: false,
+      pointerId: e.pointerId,
       startX: e.clientX,
+      startY: e.clientY,
       startAngle: angleRef.current,
+      lastX: e.clientX,
+      lastTime: performance.now(),
       moved: false,
     };
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (!dragRef.current.isDragging) return;
-    const deltaX = e.clientX - dragRef.current.startX;
-    if (Math.abs(deltaX) > 5) {
-      dragRef.current.moved = true;
+    const drag = dragRef.current;
+    if (drag.pointerId !== e.pointerId) return;
+    const deltaX = e.clientX - drag.startX;
+    const deltaY = e.clientY - drag.startY;
+    if (!drag.isDragging) {
+      if (Math.hypot(deltaX, deltaY) < 8) return;
+      if (Math.abs(deltaY) > Math.abs(deltaX) * 1.15) {
+        drag.moved = true;
+        drag.pointerId = null;
+        return;
+      }
+      if (Math.abs(deltaX) <= Math.abs(deltaY) * 1.15) return;
+      drag.isDragging = true;
+      drag.moved = true;
+      try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* pointer already cancelled */ }
     }
-    angleRef.current = dragRef.current.startAngle + deltaX * 0.005;
+    if (e.cancelable) e.preventDefault();
+    const now = performance.now();
+    const elapsed = Math.max(1, now - drag.lastTime);
+    inertiaRef.current = Math.max(-0.012, Math.min(0.012, ((e.clientX - drag.lastX) / elapsed) * 16.7 * 0.004));
+    drag.lastX = e.clientX;
+    drag.lastTime = now;
+    angleRef.current = drag.startAngle + deltaX * 0.005;
   };
 
-  const handlePointerUp = () => {
+  const handlePointerUp = (e: React.PointerEvent) => {
+    const drag = dragRef.current;
+    if (drag.pointerId !== e.pointerId) return;
+    if (drag.isDragging && e.currentTarget.hasPointerCapture(e.pointerId)) {
+      try { e.currentTarget.releasePointerCapture(e.pointerId); } catch { /* pointer already released */ }
+    }
+    drag.isDragging = false;
+    drag.pointerId = null;
+  };
+
+  const handlePointerCancel = (e: React.PointerEvent) => {
+    if (dragRef.current.pointerId !== e.pointerId) return;
     dragRef.current.isDragging = false;
+    dragRef.current.pointerId = null;
   };
 
   // Heart Tap: Ripple, petal burst, photos push outward
@@ -435,8 +478,8 @@ export default function MemoryOrbit() {
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
-        onPointerLeave={handlePointerUp}
-        className="relative w-full h-[500px] sm:h-[580px] md:h-[640px] flex items-center justify-center cursor-grab active:cursor-grabbing touch-none perspective-1000"
+        onPointerCancel={handlePointerCancel}
+        className="relative w-full h-[500px] sm:h-[580px] md:h-[640px] flex items-center justify-center cursor-grab active:cursor-grabbing touch-pan-y perspective-1000"
       >
         <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" />
 

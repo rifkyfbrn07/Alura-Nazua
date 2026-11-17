@@ -40,8 +40,11 @@ export type PhotoboothFrame = {
     | "photo-dump"
     | "maroon-scrapbook"
     | "denim-diary"
-    | "mini-gallery";
+    | "mini-gallery"
+    | "alura-toybox"
+    | "little-toy-friends";
   previewBg: string;
+  photoCount?: number;
 };
 
 export type FilterCategory = "natural" | "vintage" | "pink" | "aesthetic";

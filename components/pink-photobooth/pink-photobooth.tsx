@@ -489,17 +489,18 @@ export default function PinkPhotobooth() {
       day: "numeric",
     });
 
+    const chibiSheet = stickers.some((sticker) => sticker.type === "chibi") || selectedFrame.accentStyle === "alura-toybox"
+      ? await loadChibiSheet()
+      : undefined;
     drawPhotoboxFrame(ctx, selectedFrame, selectedLayout, canvasWidth, canvasHeight, {
       customCaption: customCaption.trim() || undefined,
       showDate,
       displayDate: todayStr,
       borderThickness,
+      chibiSheet,
     });
 
     // 4. Render Instagram Stickers & Custom Texts
-    const chibiSheet = stickers.some((sticker) => sticker.type === "chibi")
-      ? await loadChibiSheet()
-      : undefined;
     drawStickersAndTextToCanvas(ctx, stickers, texts, canvasWidth, canvasHeight, chibiSheet);
 
     return canvas.toDataURL("image/png", 1.0);
@@ -603,6 +604,13 @@ export default function PinkPhotobooth() {
 
   // Filtered camera filters
   const displayedFilters = CAMERA_FILTERS.filter((f) => f.category === filterCategory);
+  const handleSelectFrame = useCallback((frame: PhotoboothFrame) => {
+    setSelectedFrame(frame);
+    const requestedCount = frame.photoCount ?? 4;
+    // Keep already-captured frames visible when changing templates in the editor.
+    const count = currentStep === "editor" ? Math.max(requestedCount, sessionPhotos.length) : requestedCount;
+    setSelectedLayout(PHOTOBOOTH_LAYOUTS[count === 2 ? "col2" : count === 3 ? "strip3" : "strip4"]);
+  }, [currentStep, sessionPhotos.length]);
   const beginSession = () => {
     setSessionPhotos([]);
     setPendingPhoto(null);
@@ -680,12 +688,12 @@ export default function PinkPhotobooth() {
               <div><p className="text-[10px] tracking-[.2em] text-[#A94F65] font-semibold uppercase">Choose your photo strip</p><h3 className="mt-1 font-serif text-2xl text-[#702C43]">Pick a little memory frame</h3><p className="mt-1 text-xs text-[#8E6874]">Your camera stays off until you press Start Camera.</p></div>
               <span className="text-xs text-[#A94F65]">{PHOTOBOOTH_FRAMES.length} designs</span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 max-h-[min(55vh,560px)] overflow-y-auto p-1">
-              {PHOTOBOOTH_FRAMES.map((frame) => <button key={frame.id} type="button" onClick={() => setSelectedFrame(frame)} aria-pressed={selectedFrame.id === frame.id} className={`rounded-2xl border p-2.5 text-left transition-all ${selectedFrame.id === frame.id ? "border-[#A94F65] bg-[#FFF0F2] ring-2 ring-[#A94F65]/25 shadow-md" : "border-[#F0E3E3] bg-white hover:border-[#D58C9C]"}`}><FrameMiniPreview frame={frame} /><span className="mt-2 block text-xs font-medium text-[#702C43]">{frame.name}</span><span className="mt-0.5 block text-[10px] leading-tight text-[#936D79] line-clamp-2">{frame.description}</span></button>)}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 max-h-[min(55vh,560px)] overflow-y-auto p-1">
+              {PHOTOBOOTH_FRAMES.map((frame) => <button key={frame.id} type="button" onClick={() => handleSelectFrame(frame)} aria-pressed={selectedFrame.id === frame.id} className={`rounded-2xl border p-3 text-left transition-all ${selectedFrame.id === frame.id ? "border-[#A94F65] bg-[#FFF0F2] ring-2 ring-[#A94F65]/25 shadow-md" : "border-[#F0E3E3] bg-white hover:border-[#D58C9C]"}`}><FrameMiniPreview frame={frame} /><span className="mt-2 block text-xs font-medium text-[#702C43]">{frame.name}</span><span className="mt-0.5 block text-[10px] leading-tight text-[#936D79]">{frame.photoCount ?? 4} photo slots</span><span className="mt-0.5 block text-[10px] leading-tight text-[#936D79] line-clamp-2">{frame.description}</span></button>)}
             </div>
-            <div className="mt-4 flex flex-col items-center gap-2 rounded-2xl bg-[#FFF8F7] p-3 sm:flex-row sm:justify-center"><FrameMiniPreview frame={selectedFrame} /><div><p className="text-[10px] uppercase tracking-[.16em] text-[#A94F65]">Selected design</p><p className="font-serif text-sm text-[#702C43]">{selectedFrame.name}</p><p className="max-w-xs text-[10px] text-[#8E6874]">{selectedFrame.description}</p></div></div>
+            <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl bg-[#FFF8F7] p-3 sm:flex-row sm:justify-center"><div className="w-44 shrink-0"><FrameMiniPreview frame={selectedFrame} /></div><div><p className="text-[10px] uppercase tracking-[.16em] text-[#A94F65]">Selected design · {selectedFrame.photoCount ?? 4} slots</p><p className="font-serif text-sm text-[#702C43]">{selectedFrame.name}</p><p className="max-w-xs text-[10px] text-[#8E6874]">{selectedFrame.description}</p></div></div>
             <div className="mt-5 grid gap-4 md:grid-cols-[1fr_1fr_1fr_auto] md:items-end border-t border-[#F1E2E4] pt-4">
-              <fieldset><legend className="mb-1.5 text-[11px] font-semibold text-[#702C43]">Number of photos</legend><div className="flex gap-2">{[3,4].map((count) => <button key={count} onClick={() => setSelectedLayout(PHOTOBOOTH_LAYOUTS[count === 3 ? "strip3" : "strip4"])} className={`rounded-xl px-4 py-2 text-xs border ${selectedLayout.requiredPhotos === count ? "bg-[#702C43] text-white border-[#702C43]" : "bg-white border-[#E7C9D0] text-[#702C43]"}`}>{count} Photos</button>)}</div></fieldset>
+              <div className="rounded-xl bg-[#FFF7F5] px-3 py-2"><span className="block text-[10px] uppercase tracking-wider text-[#A94F65]">Photo slots</span><strong className="text-xs font-medium text-[#702C43]">{selectedFrame.photoCount ?? 4} captures · set by strip</strong></div>
               <label className="text-[11px] font-semibold text-[#702C43]">Starting filter<select value={selectedFilter.id} onChange={(e) => setSelectedFilter(CAMERA_FILTERS.find((f) => f.id === e.target.value) ?? CAMERA_FILTERS[0])} className="mt-1.5 block w-full rounded-xl border border-[#E7C9D0] bg-white px-3 py-2 text-xs font-normal">{CAMERA_FILTERS.map((filter) => <option key={filter.id} value={filter.id}>{filter.name}</option>)}</select></label>
               <label className="flex items-center gap-2 text-xs text-[#702C43]"><input type="checkbox" checked={mirrorVideo} onChange={(e) => setMirrorVideo(e.target.checked)} className="accent-[#A94F65]" />Mirror front camera</label>
               <button type="button" onClick={beginSession} className="min-h-11 rounded-full bg-gradient-to-r from-[#A94F65] to-[#702C43] px-6 py-3 text-sm font-medium text-white shadow-md hover:opacity-95 active:scale-[.98]">Start Camera <Camera className="ml-2 inline h-4 w-4" /></button>
@@ -1255,7 +1263,7 @@ export default function PinkPhotobooth() {
                         type="button"
                         onClick={() => {
                           playPaperSound();
-                          setSelectedFrame(frame);
+                          handleSelectFrame(frame);
                         }}
                         className={`p-3 rounded-2xl border text-left transition-all ${
                           selectedFrame.id === frame.id
@@ -1671,12 +1679,16 @@ function ChibiStickerIcon({ pose }: { pose: number }) {
 }
 
 function FrameMiniPreview({ frame, compact = false }: { frame: PhotoboothFrame; compact?: boolean }) {
-  const slots = 4;
+  const slots = frame.photoCount ?? 4;
   const isDenim = frame.accentStyle === "denim-diary";
   const isGallery = frame.accentStyle === "mini-gallery";
+  const isToybox = frame.accentStyle === "alura-toybox";
+  const isToyFriends = frame.accentStyle === "little-toy-friends";
   return <div className={`relative mx-auto flex w-full items-center justify-center overflow-hidden rounded-xl border ${compact ? "h-16" : "h-[112px]"}`} style={{ background: frame.bgColor, borderColor: frame.borderColor }}>
     {isDenim && <div className="absolute inset-0 opacity-40" style={{ backgroundImage: "repeating-linear-gradient(90deg,transparent 0 5px,rgba(255,255,255,.14) 6px 7px),repeating-linear-gradient(0deg,transparent 0 9px,rgba(0,0,0,.12) 10px 11px)" }} />}
     {(frame.accentStyle === "maroon-scrapbook" || isDenim) && <><i className="absolute left-0 top-0 h-1/4 w-1/5 opacity-90" style={{ backgroundImage: `conic-gradient(${frame.accentStyle === "maroon-scrapbook" ? "#a93442" : "#b3474c"} 25%,#f3e6d5 0 50%,#a93442 0 75%,#f3e6d5 0)`, backgroundSize: "12px 12px" }} /><i className="absolute bottom-0 right-0 h-1/5 w-1/4 opacity-80" style={{ backgroundImage: "repeating-linear-gradient(45deg,rgba(255,255,255,.22) 0 2px,transparent 2px 5px)" }} /></>}
+    {isToybox && <><i className="absolute bottom-1 left-2 text-[10px] text-[#B9607B]">✿</i><span className="absolute right-1 top-1"><ChibiStickerIcon pose={4} /></span><i className="absolute right-2 bottom-1 text-[10px] text-[#C49554]">★</i></>}
+    {isToyFriends && <><i className="absolute left-1 top-1 text-[11px] text-[#9085B3]">☁</i><i className="absolute right-1 top-1 text-[10px] text-[#C49554]">★</i><i className="absolute bottom-1 left-2 text-[9px] text-[#B9607B]">♡</i><i className="absolute bottom-1 right-2 text-[9px] text-[#9085B3]">☁</i></>}
     <div className={`relative flex flex-col gap-[3px] rounded-sm p-1.5 shadow-md ${isGallery ? "-rotate-2" : ""}`} style={{ width: compact ? "43%" : "42%", height: compact ? "82%" : "86%", background: isGallery ? "#fff" : frame.bgColor, border: `1px solid ${frame.borderColor}` }}>
       <span className="h-[7%] truncate text-center font-mono text-[5px] leading-none" style={{ color: frame.subtextColor }}>{frame.headerText}</span>
       {Array.from({ length: slots }).map((_, i) => <span key={i} className="min-h-0 flex-1 rounded-[2px] border border-black/10" style={{ background: i % 2 ? "linear-gradient(135deg,#f0c6cb,#d8aeb3)" : "linear-gradient(135deg,#d5d7d3,#a6a9a6)" }} />)}
